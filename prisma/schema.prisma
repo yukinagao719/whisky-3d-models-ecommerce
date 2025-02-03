@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  user              User    @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model User {
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique @db.Text
+  emailVerified    DateTime?
+  hashedPassword   String?   @db.Text
+  image            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  isDeleted        Boolean   @default(false)
+  deletedAt        DateTime?
+  accounts         Account[]
+  orders           Order[]
+  tokens           Token[]
+
+  @@index([isDeleted, deletedAt])
+  @@unique([email, isDeleted]) 
+}
+
+model Product {
+  id           String      @id @default(cuid())
+  name         String
+  nameEn       String
+  price        Int
+  description  String      @db.Text
+  displayOrder Int
+  videoUrl     String?
+  imageUrl     String
+  modelUrl     String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orderItems   OrderItem[]
+
+  @@index([name, nameEn])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String?
+  orderEmail      String      @db.Text
+  orderNumber     String      @unique
+  status          OrderStatus @default(PENDING)
+  totalAmount     Int
+  stripeSessionId String?     @unique @db.Text
+  stripePaymentId String?     @unique @db.Text
+  isPaid          Boolean     @default(false)
+  paidAt          DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User?       @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  tokens          Token[]
+
+  @@index([userId, orderEmail])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  name      String
+  nameEn    String
+  price     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Token {
+  id          String    @id @default(cuid())
+  type        TokenType
+  token       String    @unique @db.Text
+  expires     DateTime
+  identifier  String?   @db.Text
+  userId      String?
+  orderId     String?
+  createdAt   DateTime  @default(now())
+  user        User?     @relation(fields: [userId], references: [id])
+  order       Order?    @relation(fields: [orderId], references: [id])
+
+  @@unique([token, type])
+  @@index([type, userId, orderId]) 
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum TokenType {
+  VERIFICATION
+  RESET
+  DOWNLOAD
+}
