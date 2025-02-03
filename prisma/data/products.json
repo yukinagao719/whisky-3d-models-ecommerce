@@ -1,0 +1,34 @@
+{
+  "products": [
+    {
+      "displayOrder": 1,
+      "name": "山崎",
+      "nameEn": "yamazaki",
+      "price": 10000,
+      "description": "山崎は、サントリーが誇る最高峰のシングルモルトウイスキーです。1923年に竹鶴政孝が創設した山崎蒸溜所で誕生し、京都・大阪・神戸の三都に囲まれた理想的な環境と名水で醸造されています。厳選された樽での熟成により、芳醇な果実の香りと蜂蜜のような甘み、深いコクが見事な調和を実現。「和のウイスキー」の真髄として、世界中のウイスキーファンから高い評価を得ています。",
+      "videoUrl": "/videos/products/hover/yamazaki_1500x1500.mp4",
+      "imageUrl": "/images/products/yamazaki_web_1500x1500.webp",
+      "modelUrl": "/models/yamazaki_v4.2.3.glb"
+    },
+    {
+      "displayOrder": 2,
+      "name": "白州",
+      "nameEn": "hakusyu",
+      "price": 10000,
+      "description": "白州は、サントリーが誇る秀逸な日本製シングルモルトウイスキーです。1973年に設立された白州蒸溜所で生まれ、南アルプスの麓に位置する標高700メートルの清冽な環境で醸造されています。豊かな森林に囲まれた蒸溜所ならではの、爽やかでクリーンな味わいが特徴です。",
+      "videoUrl": "/videos/products/hover/hakusyu_1500x1500.mp4",
+      "imageUrl": "/images/products/hakusyu_web_1500x1500.webp",
+      "modelUrl": "/models/hakusyu_v4.2.3.glb"
+    },
+    {
+      "displayOrder": 3,
+      "name": "響",
+      "nameEn": "hibiki",
+      "price": 15000,
+      "description": "響は、サントリーが誇る最高峰の日本製プレミアムウイスキーです。1989年の発売以来、緻密な樽管理と山崎蒸溜所の卓越した技術により、優美な香りと深い味わいを実現。上品な甘みと華やかな香り、なめらかな口当たりが特徴で、「日本のウイスキー芸術品」として国際的に高い評価を得ています。",
+      "videoUrl": "/videos/products/hover/hibiki_1500x1500.mp4",
+      "imageUrl": "/images/products/hibiki_web_1500x1500.webp",
+      "modelUrl": "/models/hibiki_v4.2.3.glb"
+    }
+  ]
+}
