@@ -1,101 +1,144 @@
-import Image from "next/image";
+import DemoNotice from '@/components/DemoNotice';
+import ProductCard from '@/components/ProductCard';
+import ScrollingText from '@/components/ScrollingText';
+import { getAllProducts } from '@/lib/products';
+import { getAssetUrl } from '@/lib/assetHelpers';
+import { HERO_PATHS } from '@/lib/constants';
 
-export default function Home() {
+// レスポンシブ対応のビデオソースを定義
+const VIDEO_SOURCES = {
+  mobile: getAssetUrl(HERO_PATHS.videos.mobile),
+  tablet: getAssetUrl(HERO_PATHS.videos.tablet),
+  desktop: getAssetUrl(HERO_PATHS.videos.desktop),
+};
+
+// レスポンシブ対応のビデオソースを定義
+const FALLBACK_IMAGES = {
+  mobile: getAssetUrl(HERO_PATHS.images.mobile),
+  tablet: getAssetUrl(HERO_PATHS.images.tablet),
+  desktop: getAssetUrl(HERO_PATHS.images.desktop),
+};
+
+export default async function Home() {
+  // 商品データの取得
+  const products = await getAllProducts();
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <main>
+      {/* ヒーローセクション */}
+      <header className="relative h-screen flex justify-start items-center">
+        <h1 className="absolute z-10 font-heading text-text-primary w-full text-center text-6xl left-1/2 -translate-x-1/2 md:text-7xl xl:w-auto xl:text-8xl xl:text-left xl:left-[10%] xl:translate-x-0 animate-tracking-in-expand">
+          3D/Whisky
+        </h1>
+        {/* レスポンシブ対応のバックグラウンドビデオ */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-label="ウイスキーボトルのヒーロー動画"
+          className="absolute top-0 w-full h-full object-cover"
+        >
+          {/* デバイスサイズと向きに応じたソース設定 */}
+          <source
+            media="(max-width: 767px) and (orientation: portrait)"
+            src={VIDEO_SOURCES.mobile || ''}
+            type="video/mp4"
+          />
+          <source
+            media="(max-width: 767px) and (orientation: landscape)"
+            src={VIDEO_SOURCES.mobile || ''}
+            type="video/mp4"
+          />
+          <source
+            media="(max-width: 1279px) and (orientation: portrait)"
+            src={VIDEO_SOURCES.tablet || ''}
+            type="video/mp4"
+          />
+          <source
+            media="(max-width: 1279px) and (orientation: landscape)"
+            src={VIDEO_SOURCES.tablet || ''}
+            type="video/mp4"
+          />
+          <source src={VIDEO_SOURCES.desktop || ''} type="video/mp4" />
+          {/* ビデオ非対応環境用のフォールバック画像 */}
+          <picture>
+            <source
+              media="(max-width: 767px) and (orientation: portrait)"
+              srcSet={FALLBACK_IMAGES.mobile || ''}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <source
+              media="(max-width: 767px) and (orientation: landscape)"
+              srcSet={FALLBACK_IMAGES.mobile || ''}
+            />
+            <source
+              media="(max-width: 1279px) and (orientation: portrait)"
+              srcSet={FALLBACK_IMAGES.tablet || ''}
+            />
+            <source
+              media="(max-width: 1279px) and (orientation: landscape)"
+              srcSet={FALLBACK_IMAGES.tablet || ''}
+            />
+            <img
+              src={FALLBACK_IMAGES.desktop || ''}
+              alt="Whisky bottle hero image"
+              className="w-full h-full object-cover"
+            />
+          </picture>
+        </video>
+      </header>
+
+      <DemoNotice />
+
+      {/* コンセプトセクション */}
+      <section
+        aria-labelledby="concept-heading"
+        className="flex flex-col items-center mt-20 md:mt-28 lg:mt-40 mb-10 md:mb-12 lg:mb-16 px-4"
+      >
+        <h2
+          id="concept-heading"
+          className="text-center font-zen text-lg sm:text-3xl md:text-4xl lg:text-6xl mb-4 text-text-primary"
+        >
+          ウイスキーの美学をデジタルで紡ぎ直す
+        </h2>
+        <div className="w-full max-w-[950px] h-px mb-4 md:mb-6 lg:mb-8 bg-accent-dark" />
+        <p className="text-center font-zen text-sm md:text-lg lg:text-xl text-text-secondary leading-relaxed md:leading-loose lg:leading-10 tracking-wider lg:tracking-widest">
+          伝統的なウイスキーボトルの美しさを
+          <br className="md:hidden" />
+          現代のデジタル技術で再構築するために
+          <br />
+          3D/WHISKYは誕生しました。
+          <br />
+          オリジナルデザインへの敬意を持ち、
+          <br className="md:hidden" />
+          形状や素材感に独自の解釈を加えることで、
+          <br />
+          3Dデジタルアートとして新たな価値を創造。
+        </p>
+      </section>
+
+      {/* スクロールテキストセクション */}
+      <section className="mb- md:mb-16 lg:mb-20">
+        <ScrollingText />
+      </section>
+
+      {/* 商品一覧セクション */}
+      <section
+        aria-labelledby="lineup-heading"
+        className="mt-10 md:mt-28 lg:mt-40 px-4 container mx-auto mb-10"
+      >
+        <h2
+          id="lineup-heading"
+          className="text-center font-zen text-xl md:text-4xl lg:text-6xl mb-6 md:mb-8 lg:mb-10 text-text-primary"
+        >
+          LINE UP
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mx-5">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+    </main>
   );
 }
