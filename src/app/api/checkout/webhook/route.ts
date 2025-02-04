@@ -91,17 +91,36 @@ export async function POST(request: Request) {
   const body = await request.text();
   const signature = headers().get('stripe-signature') as string;
 
+  console.log('[Webhook Debug]', {
+    method: request.method,
+    url: request.url,
+    headers: Object.fromEntries(request.headers.entries()),
+  });
+
+  console.log('[Webhook] Received request', {
+    hasSignature: !!signature,
+    contentLength: body.length,
+  });
+
   try {
     // ①Stripeからのwebhookリクエストの署名を検証
+    console.log('[Webhook] Verifying signature');
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
 
+    console.log('[Webhook] Event type:', event.type);
+
     // ②決済完了イベントの処理
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
+
+      console.log('[Webhook] Processing completed session:', {
+        sessionId: session.id,
+        hasEmail: !!session.customer_details?.email,
+      });
 
       if (!session.customer_details?.email) {
         throw new Error('Customer email not found');
