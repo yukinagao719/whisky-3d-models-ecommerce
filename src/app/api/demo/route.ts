@@ -115,69 +115,67 @@ async function resetDemoData(userId: string) {
       const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
       // デモ注文の再作成
-      await Promise.all([
-        prisma.$transaction(async (tx) => {
-          const order = await tx.order.create({
-            data: {
-              userId: demoUser.id,
-              orderEmail: originalDemoUser.email,
-              orderNumber: 'DEMO-001',
-              totalAmount: products[0].price,
-              isPaid: true,
-              paidAt: oneWeekAgo,
-              status: 'COMPLETED',
-              items: {
-                create: {
-                  productId: products[0].id,
-                  name: products[0].name,
-                  nameEn: products[0].nameEn,
-                  price: products[0].price,
-                },
+      await prisma.$transaction(async (tx) => {
+        // 1つ目の注文を作成
+        const order1 = await tx.order.create({
+          data: {
+            userId: demoUser.id,
+            orderEmail: originalDemoUser.email,
+            orderNumber: 'DEMO-001',
+            totalAmount: products[0].price,
+            isPaid: true,
+            paidAt: oneWeekAgo,
+            status: 'COMPLETED',
+            items: {
+              create: {
+                productId: products[0].id,
+                name: products[0].name,
+                nameEn: products[0].nameEn,
+                price: products[0].price,
               },
             },
-          });
+          },
+        });
 
-          await tx.token.create({
-            data: createDownloadToken(
-              order.id,
-              oneWeekAgo,
-              demoUser.id,
-              originalDemoUser.email
-            ),
-          });
-        }),
+        await tx.token.create({
+          data: createDownloadToken(
+            order1.id,
+            oneWeekAgo,
+            demoUser.id,
+            originalDemoUser.email
+          ),
+        });
 
-        prisma.$transaction(async (tx) => {
-          const order = await tx.order.create({
-            data: {
-              userId: demoUser.id,
-              orderEmail: originalDemoUser.email,
-              orderNumber: 'DEMO-002',
-              totalAmount: products[1].price,
-              isPaid: true,
-              paidAt: now,
-              status: 'COMPLETED',
-              items: {
-                create: {
-                  productId: products[1].id,
-                  name: products[1].name,
-                  nameEn: products[1].nameEn,
-                  price: products[1].price,
-                },
+        // 2つ目の注文を作成
+        const order2 = await tx.order.create({
+          data: {
+            userId: demoUser.id,
+            orderEmail: originalDemoUser.email,
+            orderNumber: 'DEMO-002',
+            totalAmount: products[1].price,
+            isPaid: true,
+            paidAt: now,
+            status: 'COMPLETED',
+            items: {
+              create: {
+                productId: products[1].id,
+                name: products[1].name,
+                nameEn: products[1].nameEn,
+                price: products[1].price,
               },
             },
-          });
+          },
+        });
 
-          await tx.token.create({
-            data: createDownloadToken(
-              order.id,
-              now,
-              demoUser.id,
-              originalDemoUser.email
-            ),
-          });
-        }),
-      ]);
+        await tx.token.create({
+          data: createDownloadToken(
+            order2.id,
+            now,
+            demoUser.id,
+            originalDemoUser.email
+          ),
+        });
+      });
     }
 
     return true;
