@@ -82,8 +82,6 @@ const providers = {
         const email = credentials?.email;
         const password = credentials?.password;
 
-        console.log('[Auth] Attempt login:', { email });
-
         // ①入力値のチェック
         if (
           !email ||
@@ -98,12 +96,6 @@ const providers = {
         const user = await prisma.user.findUnique({
           where: { email },
           include: { accounts: true },
-        });
-
-        console.log('[Auth] User found:', {
-          found: !!user,
-          hasPassword: !!user?.hashedPassword,
-          emailVerified: !!user?.emailVerified,
         });
 
         if (!user) {
@@ -128,12 +120,6 @@ const providers = {
         if (!success) {
           console.error(`Auth rate limit exceeded for IP: ${ip}`);
           return null;
-        }
-
-        if (user?.hashedPassword) {
-          console.log('[Auth] Comparing password');
-          const isValid = await compare(password, user.hashedPassword);
-          console.log('[Auth] Password valid:', isValid);
         }
 
         // ⑤パスワードのチェック
