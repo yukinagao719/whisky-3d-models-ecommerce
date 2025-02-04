@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev:setup": "dotenv -e .env prisma generate && dotenv -e .env prisma migrate deploy && dotenv -e .env prisma db seed",
     "dev": "next dev",
-    "build:dev": "dotenv -e .env prisma generate && dotenv -e .env prisma db push",
-    "build": "dotenv -e .env.production prisma generate && dotenv -e .env.production prisma db push && next build",
+    "build": "dotenv -e .env.production prisma generate && dotenv -e .env.production prisma migrate deploy && dotenv -e .env.production prisma db seed && next build",
     "start": "next start",
-    "lint": "next lint",
-    "seed": "prisma db seed"
+    "demo:reset": "dotenv -e .env.production prisma migrate reset --force",
+    "lint": "next lint"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

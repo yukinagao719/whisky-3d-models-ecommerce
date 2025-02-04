@@ -17,6 +17,9 @@ import { Redis } from '@upstash/redis';
 
 const env = process.env.NODE_ENV || 'development';
 
+// 環境変数でレート制限の有効/無効を制御
+const RATE_LIMIT_ENABLED = process.env.RATE_LIMIT_ENABLED === 'true';
+
 const RATE_LIMITS = {
   signup: {
     windowMs: 24 * 60 * 60 * 1000,
@@ -135,6 +138,11 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname as ProtectedRoute;
   const forwardedFor = request.headers.get('x-forwarded-for');
   const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
+
+  // レート制限が無効な場合はスキップ
+  if (!RATE_LIMIT_ENABLED) {
+    return NextResponse.next();
+  }
 
   // 認証保護（/account）
   if (routeConfig[path] === 'authenticated' && !hasValidSession(request)) {
