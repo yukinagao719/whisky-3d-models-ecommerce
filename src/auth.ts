@@ -33,6 +33,9 @@ import { compare } from 'bcryptjs';
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 
+// 環境変数でレート制限の有効/無効を制御
+const RATE_LIMIT_ENABLED = process.env.RATE_LIMIT_ENABLED === 'true';
+
 // 認証レート制限の設定（クレデンシャル認証）
 const AUTH_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
@@ -111,15 +114,17 @@ const providers = {
         }
 
         // ④レート制限のチェック（１５分間に５回まで）
-        const forwardedFor = request?.headers?.get?.('x-forwarded-for');
-        const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
-        const { success } = await ratelimit.limit(
-          `${process.env.NODE_ENV}_auth:${ip}`
-        );
+        if (RATE_LIMIT_ENABLED) {
+          const forwardedFor = request?.headers?.get?.('x-forwarded-for');
+          const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
+          const { success } = await ratelimit.limit(
+            `${process.env.NODE_ENV}_auth:${ip}`
+          );
 
-        if (!success) {
-          console.error(`Auth rate limit exceeded for IP: ${ip}`);
-          return null;
+          if (!success) {
+            console.error(`Auth rate limit exceeded for IP: ${ip}`);
+            return null;
+          }
         }
 
         // ⑤パスワードのチェック
