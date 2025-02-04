@@ -8,7 +8,7 @@
 
 ## 【URL】
 
-**URL**： [3D/WHISKY](3dwhiskyshop.com)
+**URL**： [3D/WHISKY](https://3dwhiskyshop.com/)
 
 ## 【機能】
 
@@ -174,6 +174,10 @@ NEXT_PUBLIC_CLOUDFRONT_PUBLIC_URL=
 CLOUDFRONT_USER_URL=
 CLOUDFRONT_PRIVATE_URL=
 CLOUDFRONT_KEY_PAIR_ID=  # CloudFrontパブリックキーのID
+
+# レート制限の制御（true/false）
+RATE_LIMIT_ENABLED=
+
 ```
 
 ## 【今後の改善点】
