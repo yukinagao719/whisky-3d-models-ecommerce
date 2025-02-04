@@ -35,14 +35,14 @@ const getDemoUsers = () => {
       email: isDevelopment ? 'demo@example.com' : 'demo@3dwhisky.com',
       name: 'デモユーザー（購入履歴あり）',
       image: null,
-      password: isDevelopment ? '@Demo123' : '@Demo-3dwhisky-user',
+      password: isDevelopment ? '@Demo123' : '@Demo3dwhisky',
     },
     NEW_USER: {
       id: DEMO_USER_IDS.NEW_USER,
       email: isDevelopment ? 'new-demo@example.com' : 'new-demo@3dwhisky.com',
       name: 'デモユーザー（新規）',
       image: null,
-      password: isDevelopment ? '@Demo123' : '@Demo-3dwhisky-newuser',
+      password: isDevelopment ? '@Demo123' : '@Demo3dwhisky',
     },
   } as const;
 };
