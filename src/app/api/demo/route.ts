@@ -110,7 +110,12 @@ async function resetDemoData(userId: string) {
 
     // 購入履歴ありのユーザーの場合のみ、デモデータを作成
     if (userId === DEMO_USERS.WITH_HISTORY.id) {
-      const products = await prisma.product.findMany({ take: 2 });
+      const products = await prisma.product.findMany({
+        orderBy: {
+          displayOrder: 'asc',
+        },
+        take: 2,
+      });
       const now = new Date();
       const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
