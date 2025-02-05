@@ -124,7 +124,9 @@ const rateLimiters = {
 
 // 有効なセッションが存在するか判定する関数
 function hasValidSession(request: NextRequest) {
-  const sessionToken = request.cookies.get('authjs.session-token');
+  const sessionToken =
+    request.cookies.get('__Secure-authjs.session-token') ||
+    request.cookies.get('authjs.session-token');
   return !!sessionToken?.value;
 }
 
@@ -139,16 +141,16 @@ export async function middleware(request: NextRequest) {
   const forwardedFor = request.headers.get('x-forwarded-for');
   const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
 
-  // レート制限が無効な場合はスキップ
-  if (!RATE_LIMIT_ENABLED) {
-    return NextResponse.next();
-  }
-
   // 認証保護（/account）
   if (routeConfig[path] === 'authenticated' && !hasValidSession(request)) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('callbackUrl', request.url);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // レート制限が無効な場合はスキップ
+  if (!RATE_LIMIT_ENABLED) {
+    return NextResponse.next();
   }
 
   // サインアップのレート制限
