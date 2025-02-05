@@ -4,6 +4,7 @@ import ScrollingText from '@/components/ScrollingText';
 import { getAllProducts } from '@/lib/products';
 import { getAssetUrl } from '@/lib/assetHelpers';
 import { HERO_PATHS } from '@/lib/constants';
+import HeroVideo from '@/components/HeroVideo';
 
 // レスポンシブ対応のビデオソースを定義
 const VIDEO_SOURCES = {
@@ -30,44 +31,12 @@ export default async function Home() {
         <h1 className="absolute z-10 font-heading text-text-primary w-full text-center text-6xl left-1/2 -translate-x-1/2 md:text-7xl xl:w-auto xl:text-8xl xl:text-left xl:left-[10%] xl:translate-x-0 animate-tracking-in-expand">
           3D/Whisky
         </h1>
+
         {/* レスポンシブ対応のバックグラウンドビデオ */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-label="ウイスキーボトルのヒーロー動画"
-          className="absolute top-0 w-full h-full object-cover"
-        >
-          {/* デバイスサイズに応じたソース設定 */}
-          <source
-            media="(max-width: 767px)"
-            src={VIDEO_SOURCES.mobile || ''}
-            type="video/mp4"
-          />
-          <source
-            media="(max-width: 1279px)"
-            src={VIDEO_SOURCES.tablet || ''}
-            type="video/mp4"
-          />
-          <source src={VIDEO_SOURCES.desktop || ''} type="video/mp4" />
-          {/* ビデオ非対応環境用のフォールバック画像 */}
-          <picture>
-            <source
-              media="(max-width: 767px)"
-              srcSet={FALLBACK_IMAGES.mobile || ''}
-            />
-            <source
-              media="(max-width: 1279px)"
-              srcSet={FALLBACK_IMAGES.tablet || ''}
-            />
-            <img
-              src={FALLBACK_IMAGES.desktop || ''}
-              alt="Whisky bottle hero image"
-              className="w-full h-full object-cover"
-            />
-          </picture>
-        </video>
+        <HeroVideo
+          videoSources={VIDEO_SOURCES}
+          fallbackImages={FALLBACK_IMAGES}
+        />
       </header>
 
       <DemoNotice />
