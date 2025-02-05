@@ -39,24 +39,14 @@ export default async function Home() {
           aria-label="ウイスキーボトルのヒーロー動画"
           className="absolute top-0 w-full h-full object-cover"
         >
-          {/* デバイスサイズと向きに応じたソース設定 */}
+          {/* デバイスサイズに応じたソース設定 */}
           <source
-            media="(max-width: 767px) and (orientation: portrait)"
+            media="(max-width: 767px)"
             src={VIDEO_SOURCES.mobile || ''}
             type="video/mp4"
           />
           <source
-            media="(max-width: 767px) and (orientation: landscape)"
-            src={VIDEO_SOURCES.mobile || ''}
-            type="video/mp4"
-          />
-          <source
-            media="(max-width: 1279px) and (orientation: portrait)"
-            src={VIDEO_SOURCES.tablet || ''}
-            type="video/mp4"
-          />
-          <source
-            media="(max-width: 1279px) and (orientation: landscape)"
+            media="(max-width: 1279px)"
             src={VIDEO_SOURCES.tablet || ''}
             type="video/mp4"
           />
@@ -64,19 +54,11 @@ export default async function Home() {
           {/* ビデオ非対応環境用のフォールバック画像 */}
           <picture>
             <source
-              media="(max-width: 767px) and (orientation: portrait)"
+              media="(max-width: 767px)"
               srcSet={FALLBACK_IMAGES.mobile || ''}
             />
             <source
-              media="(max-width: 767px) and (orientation: landscape)"
-              srcSet={FALLBACK_IMAGES.mobile || ''}
-            />
-            <source
-              media="(max-width: 1279px) and (orientation: portrait)"
-              srcSet={FALLBACK_IMAGES.tablet || ''}
-            />
-            <source
-              media="(max-width: 1279px) and (orientation: landscape)"
+              media="(max-width: 1279px)"
               srcSet={FALLBACK_IMAGES.tablet || ''}
             />
             <img

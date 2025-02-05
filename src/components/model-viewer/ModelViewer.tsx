@@ -29,7 +29,7 @@ export default function ModelViewer({ modelUrl, imageUrl }: ModelViewerProps) {
     <div
       aria-label="3Dモデルビューワー"
       role="region"
-      className="w-full relative h-screen md:aspect-[16/9] lg:h-[600px]"
+      className="w-full relative h-[calc(100vh-85px)] md:aspect-[16/9] lg:h-[600px]"
     >
       <Suspense
         fallback={
@@ -84,7 +84,7 @@ export default function ModelViewer({ modelUrl, imageUrl }: ModelViewerProps) {
               enableDamping
               dampingFactor={0.05}
               target={[0, -5, 0]}
-              enableZoom={!isMobile}
+              enableZoom={true}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,
                 MIDDLE: THREE.MOUSE.DOLLY,
@@ -95,7 +95,6 @@ export default function ModelViewer({ modelUrl, imageUrl }: ModelViewerProps) {
                 TWO: THREE.TOUCH.DOLLY_PAN,
               }}
               rotateSpeed={isMobile ? 0.7 : 1}
-              makeDefault
             />
           </Canvas>
         </ErrorBoundary>
