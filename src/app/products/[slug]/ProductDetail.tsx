@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import ModelViewer from '@/components/model-viewer/ModelViewer';
+import LazyModelViewer from '@/components/model-viewer/LazyModelViewer';
 import { useCartStore } from '@/store/cartStore';
 import { capitalize } from '@/utils/string';
 import { Product } from '@/types/shop';
@@ -73,7 +73,17 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         aria-label="商品3Dモデル"
         className="w-full lg:w-2/5 lg:sticky lg:top-16 lg:mt-0 -mt-8"
       >
-        <ModelViewer modelUrl={product.modelUrl} imageUrl={product.imageUrl} />
+        {product.modelUrl ? (
+          <LazyModelViewer modelUrl={product.modelUrl} imageUrl={product.imageUrl} />
+        ) : (
+          <div className="w-full h-[400px] lg:h-[500px] bg-background-secondary rounded-lg flex items-center justify-center">
+            <img 
+              src={product.imageUrl} 
+              alt={product.name} 
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+          </div>
+        )}
       </section>
 
       {/* 商品詳細情報セクション */}
