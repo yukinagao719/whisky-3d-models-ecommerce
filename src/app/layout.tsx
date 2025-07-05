@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     title: '3D/WHISKY|ウイスキーの美学をデジタルで紡ぎ直す',
     description:
       '伝統的なウイスキーボトルの美しさを3Dデジタルアートとして再構築。オリジナルデザインへの敬意を持ち、形状や素材感に独自の解釈を加え、現代のデジタル技術で新たな価値を創造する3Dモデル販売プラットフォーム。',
-    images: ['/og-image.jpg'],
+    images: ['/ogp-image_1200x630.png'],
     creator: '@iyo_whisky',
   },
 };

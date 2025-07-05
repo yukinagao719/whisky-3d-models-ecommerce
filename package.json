@@ -6,6 +6,7 @@
     "dev:setup": "dotenv -e .env prisma generate && dotenv -e .env prisma migrate deploy && dotenv -e .env prisma db seed",
     "dev": "next dev",
     "build": "dotenv -e .env.production prisma generate && dotenv -e .env.production prisma migrate deploy && dotenv -e .env.production prisma db seed && next build",
+    "analyze": "ANALYZE=true npm run build",
     "start": "next start",
     "demo:reset": "dotenv -e .env.production prisma migrate reset --force",
     "lint": "next lint",
@@ -51,6 +52,7 @@
     "zustand": "^5.0.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.3.5",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
