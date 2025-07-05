@@ -11,10 +11,9 @@ type VerifyEmailPageProps = {
   }>;
 };
 
-export default async function EmailVerificationPage({
+export default function EmailVerificationPage({
   params,
 }: VerifyEmailPageProps) {
-  const resolvedParams = await params;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +21,7 @@ export default async function EmailVerificationPage({
 
   useEffect(() => {
     const verifyEmail = async () => {
+      const resolvedParams = await params;
       setIsLoading(true);
       setError(null);
 
@@ -63,7 +63,7 @@ export default async function EmailVerificationPage({
     };
 
     verifyEmail();
-  }, [resolvedParams.token, router]);
+  }, [params, router]);
 
   return (
     <main className="flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8">

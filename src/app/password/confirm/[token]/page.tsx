@@ -12,10 +12,9 @@ type ConfirmPasswordResetPageProps = {
   }>;
 };
 
-export default async function ConfirmPasswordResetPage({
+export default function ConfirmPasswordResetPage({
   params,
 }: ConfirmPasswordResetPageProps) {
-  const resolvedParams = await params;
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -50,6 +49,7 @@ export default async function ConfirmPasswordResetPage({
     }
 
     try {
+      const resolvedParams = await params;
       // パスワードリセットの実行
       const response = await fetch('/api/auth/password/confirm', {
         method: 'POST',
