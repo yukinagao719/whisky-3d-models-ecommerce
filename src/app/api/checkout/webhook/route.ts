@@ -89,7 +89,7 @@ async function createOrder(
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = headers().get('stripe-signature') as string;
+  const signature = (await headers()).get('stripe-signature') as string;
 
   try {
     // ①Stripeからのwebhookリクエストの署名を検証

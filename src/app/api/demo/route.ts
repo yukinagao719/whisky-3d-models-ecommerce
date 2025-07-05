@@ -23,8 +23,8 @@ const createDownloadToken = (
 });
 
 // デモユーザー情報を取得する関数
-const getDemoUsers = () => {
-  const headersList = headers();
+const getDemoUsers = async () => {
+  const headersList = await headers();
   const host = headersList.get('host');
   const isDevelopment =
     host?.includes('localhost') || host?.includes('127.0.0.1');
@@ -59,7 +59,7 @@ async function resetDemoData(userId: string) {
       throw new Error('Demo user not found or email is missing');
     }
 
-    const DEMO_USERS = getDemoUsers();
+    const DEMO_USERS = await getDemoUsers();
 
     // IDによってデモユーザータイプを判定
     const originalDemoUser = Object.values(DEMO_USERS).find(
@@ -193,7 +193,7 @@ async function resetDemoData(userId: string) {
 export async function POST() {
   try {
     const session = await auth();
-    const DEMO_USERS = getDemoUsers();
+    const DEMO_USERS = await getDemoUsers();
 
     // 削除済みのデモユーザーのメールアドレスパターンをチェック
     const isDeletedDemoUser =
