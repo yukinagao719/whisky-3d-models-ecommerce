@@ -6,9 +6,9 @@ import { DownloadContent } from './download-content';
 export const dynamic = 'force-dynamic';
 
 type DownloadPageProps = {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 };
 
 // ダウンロードトークンから有効な注文情報を取得
@@ -47,8 +47,9 @@ async function getOrderByToken(token: string) {
 }
 
 export default async function DownloadPage({ params }: DownloadPageProps) {
+  const resolvedParams = await params;
   // トークンから注文情報を取得
-  const order = await getOrderByToken(params.token);
+  const order = await getOrderByToken(resolvedParams.token);
 
   // 無効なトークンの場合は404ページを表示
   if (!order) {

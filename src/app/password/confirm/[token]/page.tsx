@@ -7,9 +7,9 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { PASSWORD_VALIDATION, validatePassword } from '@/utils/validation';
 
 type ConfirmPasswordResetPageProps = {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 };
 
 export default function ConfirmPasswordResetPage({
@@ -49,6 +49,7 @@ export default function ConfirmPasswordResetPage({
     }
 
     try {
+      const resolvedParams = await params;
       // パスワードリセットの実行
       const response = await fetch('/api/auth/password/confirm', {
         method: 'POST',
@@ -56,7 +57,7 @@ export default function ConfirmPasswordResetPage({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: params.token,
+          token: resolvedParams.token,
           password,
         }),
       });
