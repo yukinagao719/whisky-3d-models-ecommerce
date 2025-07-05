@@ -58,11 +58,12 @@ async function validateAccess(
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // ①認証情報の取得
     const session = await auth();
+    const resolvedParams = await params;
 
     const url = new URL(request.url);
     const token = url.searchParams.get('token');
@@ -73,7 +74,7 @@ export async function GET(
 
     // ②注文商品データの取得
     const item = await prisma.orderItem.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       include: {
         order: {
           select: {

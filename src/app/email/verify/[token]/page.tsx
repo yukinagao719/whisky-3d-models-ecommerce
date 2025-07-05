@@ -6,14 +6,15 @@ import { Loader2, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
 type VerifyEmailPageProps = {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 };
 
-export default function EmailVerificationPage({
+export default async function EmailVerificationPage({
   params,
 }: VerifyEmailPageProps) {
+  const resolvedParams = await params;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export default function EmailVerificationPage({
       setError(null);
 
       // 認証トークンのチェック
-      if (!params.token) {
+      if (!resolvedParams.token) {
         setError('無効な認証トークンです');
         setIsLoading(false);
         return;
@@ -38,7 +39,7 @@ export default function EmailVerificationPage({
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ token: params.token }),
+          body: JSON.stringify({ token: resolvedParams.token }),
         });
 
         const data = await response.json();
@@ -62,7 +63,7 @@ export default function EmailVerificationPage({
     };
 
     verifyEmail();
-  }, [params.token, router]);
+  }, [resolvedParams.token, router]);
 
   return (
     <main className="flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8">

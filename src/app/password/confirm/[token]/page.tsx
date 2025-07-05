@@ -7,14 +7,15 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { PASSWORD_VALIDATION, validatePassword } from '@/utils/validation';
 
 type ConfirmPasswordResetPageProps = {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 };
 
-export default function ConfirmPasswordResetPage({
+export default async function ConfirmPasswordResetPage({
   params,
 }: ConfirmPasswordResetPageProps) {
+  const resolvedParams = await params;
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -56,7 +57,7 @@ export default function ConfirmPasswordResetPage({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: params.token,
+          token: resolvedParams.token,
           password,
         }),
       });
