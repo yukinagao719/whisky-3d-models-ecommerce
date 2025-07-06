@@ -1,0 +1,206 @@
+'use client';
+
+import React, { Component, ReactNode, ErrorInfo } from 'react';
+import { ErrorRecoveryActions } from '@/lib/error-handler';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  enableReporting?: boolean;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+  errorInfo?: ErrorInfo;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    // Update state to trigger the error boundary
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error details
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    this.setState({ error, errorInfo });
+    
+    // Call custom error handler if provided
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
+    
+    // Report error to monitoring service
+    if (this.props.enableReporting) {
+      this.reportError(error, errorInfo);
+    }
+  }
+
+  private reportError(error: Error, errorInfo: ErrorInfo) {
+    // In production, this would send to error monitoring service
+    const errorReport = {
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+    };
+    
+    // Example: send to error reporting service
+    // errorReportingService.report(errorReport);
+    console.error('Error Report:', errorReport);
+  }
+
+  private handleRetry = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+  };
+
+  render() {
+    if (this.state.hasError) {
+      // Custom fallback UI
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+      
+      // Default error UI
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background-primary">
+          <div className="max-w-md w-full mx-4">
+            <div className="bg-background-secondary rounded-lg p-6 text-center">
+              <div className="text-red-500 mb-4">
+                <svg 
+                  className="w-16 h-16 mx-auto" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                  />
+                </svg>
+              </div>
+              
+              <h2 className="text-xl font-semibold text-text-primary mb-2">
+                予期せぬエラーが発生しました
+              </h2>
+              
+              <p className="text-text-secondary mb-6">
+                申し訳ありません。アプリケーションでエラーが発生しました。
+                お手数ですが、ページを再読み込みするか、後ほど再度お試しください。
+              </p>
+              
+              {/* Error details (development only) */}
+              {process.env.NODE_ENV === 'development' && this.state.error && (
+                <details className="mb-6 text-left">
+                  <summary className="cursor-pointer text-sm text-text-secondary mb-2">
+                    エラー詳細 (開発用)
+                  </summary>
+                  <div className="bg-background-primary p-3 rounded text-xs font-mono text-red-400 overflow-auto max-h-40">
+                    <div className="mb-2">
+                      <strong>Error:</strong> {this.state.error.message}
+                    </div>
+                    {this.state.error.stack && (
+                      <div>
+                        <strong>Stack:</strong>
+                        <pre className="whitespace-pre-wrap mt-1">
+                          {this.state.error.stack}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </details>
+              )}
+              
+              {/* Recovery actions */}
+              <div className="space-y-2">
+                <button
+                  onClick={this.handleRetry}
+                  className="w-full bg-accent-dark hover:bg-accent-light text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  再試行
+                </button>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={ErrorRecoveryActions.reload}
+                    className="flex-1 bg-background-primary hover:bg-gray-700 text-text-primary px-4 py-2 rounded-lg transition-colors"
+                  >
+                    ページ再読み込み
+                  </button>
+                  
+                  <button
+                    onClick={ErrorRecoveryActions.goHome}
+                    className="flex-1 bg-background-primary hover:bg-gray-700 text-text-primary px-4 py-2 rounded-lg transition-colors"
+                  >
+                    ホームに戻る
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Hook for functional components
+export function withErrorBoundary<P extends object>(
+  Component: React.ComponentType<P>,
+  errorBoundaryProps?: Omit<Props, 'children'>
+) {
+  const WrappedComponent = (props: P) => (
+    <ErrorBoundary {...errorBoundaryProps}>
+      <Component {...props} />
+    </ErrorBoundary>
+  );
+  
+  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
+  
+  return WrappedComponent;
+}
+
+// Specific error boundary for async components
+export function AsyncErrorBoundary({ 
+  children, 
+  fallback 
+}: { 
+  children: ReactNode; 
+  fallback?: ReactNode;
+}) {
+  return (
+    <ErrorBoundary
+      fallback={fallback || (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-center">
+            <div className="text-red-500 mb-2">
+              <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-text-secondary text-sm">
+              コンポーネントの読み込みに失敗しました
+            </p>
+          </div>
+        </div>
+      )}
+      enableReporting={true}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
