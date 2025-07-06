@@ -2,12 +2,12 @@
 
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Stage, OrbitControls } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { ErrorBoundary } from './ErrorBoundary';
 import { ErrorFallback } from './ErrorFallback';
 import { LoadingScreen } from './LoadingScreen';
-import { Model } from './Model';
+import { SafeStage } from './SafeStage';
 import { useIsMobile } from './hooks/useIsMobile';
 
 type ModelViewerProps = {
@@ -47,7 +47,7 @@ export default function ModelViewer({ modelUrl, imageUrl }: ModelViewerProps) {
             aria-label="3Dモデル表示キャンバス"
             // カメラの設定
             camera={{
-              position: [0, -5, 10],
+              position: [0, 2, 10],
               fov: 40,
               near: 0.1,
               far: 100,
@@ -58,21 +58,19 @@ export default function ModelViewer({ modelUrl, imageUrl }: ModelViewerProps) {
               preserveDrawingBuffer: true,
               powerPreference: 'high-performance',
               failIfMajorPerformanceCaveat: true,
+              outputColorSpace: THREE.SRGBColorSpace, // sRGB色空間を明示的に設定
+            }}
+            onCreated={({ gl }) => {
+              // レンダラーの追加設定
+              gl.toneMapping = THREE.NoToneMapping;
+              gl.toneMappingExposure = 1;
             }}
           >
             {/* 背景色の設定 */}
             <color attach="background" args={['#1C1C1C']} />
 
-            {/* 3Dモデルの表示環境設定 */}
-            <Stage
-              environment="apartment"
-              intensity={5}
-              shadows
-              adjustCamera={false}
-              preset="rembrandt"
-            >
-              <Model url={modelUrl} />
-            </Stage>
+            {/* 3Dモデルの表示環境設定（フォールバック付き） */}
+            <SafeStage modelUrl={modelUrl} />
 
             {/* 3Dモデルの操作制御 */}
             <OrbitControls
@@ -83,7 +81,7 @@ export default function ModelViewer({ modelUrl, imageUrl }: ModelViewerProps) {
               maxPolarAngle={Math.PI / 2.1}
               enableDamping
               dampingFactor={0.05}
-              target={[0, -5, 0]}
+              target={[0, 2.5, 0]}
               enableZoom={true}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,

@@ -7,28 +7,6 @@ const withBundleAnalyzer = bundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Three.js最適化設定
-  experimental: {
-    optimizePackageImports: ['@react-three/fiber', '@react-three/drei'],
-  },
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Three.js関連のチャンク分割最適化
-    if (!isServer) {
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks.cacheGroups,
-          three: {
-            test: /[\\/]node_modules[\\/](three|@react-three)[\\/]/,
-            name: 'three',
-            chunks: 'all',
-            priority: 10,
-          },
-        },
-      };
-    }
-    return config;
-  },
   images: {
     remotePatterns: [
       {
@@ -64,9 +42,9 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "img-src 'self' data: https://avatars.githubusercontent.com https://lh3.googleusercontent.com https://*.cloudfront.net",
+              "img-src 'self' data: blob: https://avatars.githubusercontent.com https://lh3.googleusercontent.com https://*.cloudfront.net",
               "font-src 'self' https://fonts.gstatic.com",
-              "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://*.amazonaws.com https://*.cloudfront.net",
+              "connect-src 'self' blob: https://api.stripe.com https://checkout.stripe.com https://*.amazonaws.com https://*.cloudfront.net",
               "media-src 'self' https://*.cloudfront.net",
               "object-src 'none'",
               "base-uri 'self'",

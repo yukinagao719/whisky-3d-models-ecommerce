@@ -5,6 +5,26 @@ import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
+// Web API のモック
+global.Request = jest.fn().mockImplementation((url, init) => ({
+  url,
+  method: init?.method || 'GET',
+  headers: new Map(Object.entries(init?.headers || {})),
+  json: jest.fn().mockResolvedValue(JSON.parse(init?.body || '{}')),
+}));
+
+global.Response = jest.fn().mockImplementation((body, init) => ({
+  json: jest.fn().mockResolvedValue(JSON.parse(body || '{}')),
+  status: init?.status || 200,
+  ok: (init?.status || 200) >= 200 && (init?.status || 200) < 300,
+}));
+
+global.Headers = jest.fn().mockImplementation(() => ({
+  get: jest.fn(),
+  set: jest.fn(),
+  has: jest.fn(),
+}));
+
 // ResizeObserver のモック
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),

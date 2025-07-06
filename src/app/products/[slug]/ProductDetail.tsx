@@ -3,10 +3,26 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import LazyModelViewer from '@/components/model-viewer/LazyModelViewer';
+import dynamic from 'next/dynamic';
 import { useCartStore } from '@/store/cartStore';
 import { capitalize } from '@/utils/string';
 import { Product } from '@/types/shop';
+
+// ModelViewerを動的インポート（SSR無効）
+const ModelViewer = dynamic(
+  () => import('@/components/model-viewer/ModelViewer'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[400px] lg:h-[500px] bg-background-secondary rounded-lg flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-2 border-accent-dark border-t-transparent rounded-full mx-auto mb-2"></div>
+          <p className="text-text-secondary text-sm">Loading 3D Model...</p>
+        </div>
+      </div>
+    )
+  }
+);
 
 type ProductDetailProps = {
   product: Product;
@@ -73,17 +89,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         aria-label="商品3Dモデル"
         className="w-full lg:w-2/5 lg:sticky lg:top-16 lg:mt-0 -mt-8"
       >
-        {product.modelUrl ? (
-          <LazyModelViewer modelUrl={product.modelUrl} imageUrl={product.imageUrl} />
-        ) : (
-          <div className="w-full h-[400px] lg:h-[500px] bg-background-secondary rounded-lg flex items-center justify-center">
-            <img 
-              src={product.imageUrl} 
-              alt={product.name} 
-              className="max-w-full max-h-full object-contain rounded-lg"
-            />
-          </div>
-        )}
+        <ModelViewer modelUrl={product.modelUrl} imageUrl={product.imageUrl} />
       </section>
 
       {/* 商品詳細情報セクション */}
