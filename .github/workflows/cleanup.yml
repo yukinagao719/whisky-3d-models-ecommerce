@@ -1,0 +1,128 @@
+name: Cleanup
+
+on:
+  schedule:
+    # Run cleanup weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  # Clean up old workflow runs
+  cleanup-workflows:
+    runs-on: ubuntu-latest
+    name: Cleanup Old Workflow Runs
+    permissions:
+      actions: write
+    
+    steps:
+      - name: Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 30
+          keep_minimum_runs: 10
+
+  # Clean up old deployment previews
+  cleanup-deployments:
+    runs-on: ubuntu-latest
+    name: Cleanup Old Deployments
+    if: false # Enable if using deployment cleanup
+    
+    steps:
+      - name: Cleanup old Vercel deployments
+        run: |
+          # This would require Vercel CLI and proper authentication
+          echo "Cleanup old deployments (placeholder)"
+
+  # Clean up old artifacts
+  cleanup-artifacts:
+    runs-on: ubuntu-latest
+    name: Cleanup Old Artifacts
+    permissions:
+      actions: write
+    
+    steps:
+      - name: Delete old artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            
+            for (const artifact of artifacts.data.artifacts) {
+              const createdAt = new Date(artifact.created_at);
+              if (createdAt < oneWeekAgo) {
+                console.log(`Deleting artifact: ${artifact.name} (${artifact.created_at})`);
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id
+                });
+              }
+            }
+
+  # Clean up stale branches
+  cleanup-branches:
+    runs-on: ubuntu-latest
+    name: Cleanup Stale Branches
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Delete merged feature branches
+        run: |
+          # Get all remote branches
+          git fetch --all
+          
+          # Get merged branches (excluding main, develop, and release branches)
+          MERGED_BRANCHES=$(git branch -r --merged origin/main | grep -v "origin/main" | grep -v "origin/develop" | grep -v "origin/release" | grep "origin/feature\|origin/hotfix\|origin/bugfix" | sed 's/origin\///' | xargs)
+          
+          if [ -n "$MERGED_BRANCHES" ]; then
+            echo "Found merged branches to delete: $MERGED_BRANCHES"
+            for branch in $MERGED_BRANCHES; do
+              # Check if branch has open PR
+              PR_COUNT=$(gh pr list --state=open --head="$branch" --json number --jq '. | length')
+              if [ "$PR_COUNT" -eq 0 ]; then
+                echo "Deleting merged branch: $branch"
+                git push origin --delete "$branch" || echo "Failed to delete $branch"
+              else
+                echo "Skipping $branch (has open PR)"
+              fi
+            done
+          else
+            echo "No merged branches to delete"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Report cleanup summary
+  cleanup-summary:
+    runs-on: ubuntu-latest
+    name: Cleanup Summary
+    needs: [cleanup-workflows, cleanup-artifacts, cleanup-branches]
+    if: always()
+    
+    steps:
+      - name: Create cleanup summary
+        run: |
+          echo "🧹 Cleanup Summary"
+          echo "=================="
+          echo "- Workflow runs: ${{ needs.cleanup-workflows.result }}"
+          echo "- Artifacts: ${{ needs.cleanup-artifacts.result }}"
+          echo "- Branches: ${{ needs.cleanup-branches.result }}"
+          echo ""
+          echo "Cleanup completed on $(date)"

@@ -17,7 +17,11 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "test:setup": "node scripts/setup-test-db.js",
+    "test:cleanup": "node scripts/cleanup-test-db.js",
+    "ci:test": "npm run test:setup && npm run test:ci && npm run test:cleanup",
+    "ci:e2e": "npm run test:setup && npm run test:e2e && npm run test:cleanup"
   },
   "prisma": {
     "seed": "ts-node -r tsconfig-paths/register --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

@@ -1,0 +1,158 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  # Create GitHub Release
+  create-release:
+    runs-on: ubuntu-latest
+    name: Create Release
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: |
+          npm run test:ci
+          npm run lint
+
+      - name: Build application
+        run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: true
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "## Changes" > CHANGELOG.md
+            git log --pretty=format:"- %s (%h)" >> CHANGELOG.md
+          else
+            echo "## Changes since $PREVIOUS_TAG" > CHANGELOG.md
+            git log $PREVIOUS_TAG..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md
+          fi
+          
+          # Set output for use in release
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat CHANGELOG.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
+
+  # Deploy to production
+  deploy-production:
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    needs: create-release
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel Production
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+      - name: Notify deployment success
+        run: |
+          echo "🚀 Successfully deployed ${{ github.ref_name }} to production!"
+
+  # Health check after deployment
+  health-check:
+    runs-on: ubuntu-latest
+    name: Health Check
+    needs: deploy-production
+    
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Check application health
+        run: |
+          # Replace with your production URL
+          PROD_URL="https://3dwhiskyshop.com"
+          
+          echo "Checking $PROD_URL health..."
+          
+          # Check if the main page loads
+          if curl -f -s "$PROD_URL" > /dev/null; then
+            echo "✅ Main page is accessible"
+          else
+            echo "❌ Main page is not accessible"
+            exit 1
+          fi
+          
+          # Check if API is responding
+          if curl -f -s "$PROD_URL/api/health" > /dev/null; then
+            echo "✅ API is responding"
+          else
+            echo "⚠️ API health check endpoint not found (this is optional)"
+          fi
+          
+          echo "🎉 Health check completed successfully!"
+
+  # Post-deployment tasks
+  post-deployment:
+    runs-on: ubuntu-latest
+    name: Post-deployment Tasks
+    needs: health-check
+    if: always()
+    
+    steps:
+      - name: Update deployment status
+        run: |
+          if [ "${{ needs.health-check.result }}" = "success" ]; then
+            echo "✅ Deployment successful"
+            echo "deployment-status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Deployment failed"
+            echo "deployment-status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create deployment issue on failure
+        if: needs.health-check.result == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Deployment failed for ${context.ref}`,
+              body: `Deployment of ${context.ref} to production failed during health checks.\n\nPlease investigate and resolve the issue.`,
+              labels: ['bug', 'deployment', 'urgent']
+            })

@@ -1,0 +1,156 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # PR Title and Description Check
+  pr-validation:
+    runs-on: ubuntu-latest
+    name: PR Validation
+    
+    steps:
+      - name: Check PR title format
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            chore
+            ci
+          requireScope: false
+          subjectPattern: ^.{1,72}$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            doesn't start with an uppercase character and is not longer than 72 characters.
+
+  # Check for breaking changes
+  breaking-changes:
+    runs-on: ubuntu-latest
+    name: Breaking Changes Check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for API breaking changes
+        run: |
+          # Check if there are changes to API routes
+          if git diff --name-only HEAD^ HEAD | grep -E "src/app/api|pages/api"; then
+            echo "⚠️ API changes detected. Please ensure backward compatibility."
+            echo "api-changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for database schema changes
+        run: |
+          # Check if there are changes to Prisma schema
+          if git diff --name-only HEAD^ HEAD | grep -E "prisma/schema.prisma"; then
+            echo "⚠️ Database schema changes detected. Please ensure migration compatibility."
+            echo "schema-changes=true" >> $GITHUB_OUTPUT
+          fi
+
+  # Size Impact Check
+  bundle-size:
+    runs-on: ubuntu-latest
+    name: Bundle Size Impact
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup build environment
+        run: |
+          touch .env.production
+          echo "DATABASE_URL=file:./build.db" >> .env.production
+          echo "AUTH_SECRET=build-secret-key" >> .env.production
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build and analyze bundle
+        run: npm run analyze
+        env:
+          SKIP_ENV_VALIDATION: true
+
+      - name: Comment bundle size
+        uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          build_script: build
+
+  # Lighthouse Performance Check
+  lighthouse:
+    runs-on: ubuntu-latest
+    name: Lighthouse Performance Check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup test environment
+        run: |
+          touch .env.test
+          echo "APP_URL=http://localhost:3000" >> .env.test
+          echo "DATABASE_URL=file:./test.db" >> .env.test
+          echo "AUTH_SECRET=test-secret-key" >> .env.test
+
+      - name: Generate Prisma client and setup database
+        run: |
+          npx prisma generate
+          npx prisma db push
+
+      - name: Build and start application
+        run: |
+          npm run build
+          npm start &
+          sleep 30 # Wait for app to start
+        env:
+          SKIP_ENV_VALIDATION: true
+
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            http://localhost:3000
+            http://localhost:3000/products
+          configPath: './.lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true

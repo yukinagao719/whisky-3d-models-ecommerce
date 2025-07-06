@@ -1,0 +1,68 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "yukinagao719"
+    assignees:
+      - "yukinagao719"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    # Group updates for common packages
+    groups:
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      nextjs:
+        patterns:
+          - "next*"
+          - "@next/*"
+      three:
+        patterns:
+          - "three*"
+          - "@react-three/*"
+      testing:
+        patterns:
+          - "jest*"
+          - "@playwright/*"
+          - "@testing-library/*"
+      security:
+        patterns:
+          - "*security*"
+          - "*audit*"
+        priority: 1
+    # Ignore specific packages that require manual updates
+    ignore:
+      - dependency-name: "next"
+        # Ignore patch updates for Next.js as they may include breaking changes
+        update-types: ["version-update:semver-patch"]
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "yukinagao719"
+    assignees:
+      - "yukinagao719"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "ci"
+      - "automated"
