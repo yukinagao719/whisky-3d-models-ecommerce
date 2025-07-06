@@ -83,6 +83,12 @@ jobs:
           touch .env.test
           echo "DATABASE_URL=file:./test.db" >> .env.test
           echo "AUTH_SECRET=test-secret-key-for-ci-minimum-32-chars" >> .env.test
+          echo "NEXTAUTH_SECRET=test-nextauth-secret-minimum-32-chars" >> .env.test
+          echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_unit" >> .env.test
+          echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_unit" >> .env.test
+          echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_unit" >> .env.test
+          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.test
+          echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_unit" >> .env.test
 
       - name: Generate Prisma client
         run: npx prisma generate --schema=prisma/schema.ci.prisma
@@ -126,8 +132,21 @@ jobs:
           echo "APP_URL=http://localhost:3000" >> .env.test
           echo "DATABASE_URL=file:./test.db" >> .env.test
           echo "AUTH_SECRET=test-secret-key-for-ci-minimum-32-chars" >> .env.test
+          echo "NEXTAUTH_SECRET=test-nextauth-secret-minimum-32-chars" >> .env.test
           echo "NEXTAUTH_URL=http://localhost:3000" >> .env.test
           echo "RATE_LIMIT_ENABLED=false" >> .env.test
+          echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_e2e" >> .env.test
+          echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_e2e" >> .env.test
+          echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_e2e" >> .env.test
+          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.test
+          echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_e2e" >> .env.test
+          echo "FROM_EMAIL=test@example.com" >> .env.test
+          echo "RESEND_API_KEY=test_resend_api_key" >> .env.test
+          echo "AWS_ACCESS_KEY_ID=test_aws_access_key" >> .env.test
+          echo "AWS_SECRET_ACCESS_KEY=test_aws_secret_key" >> .env.test
+          echo "AWS_REGION=us-east-1" >> .env.test
+          echo "S3_USER_BUCKET=test-bucket" >> .env.test
+          echo "NEXT_PUBLIC_CLOUDFRONT_PUBLIC_URL=https://test.cloudfront.net" >> .env.test
 
       - name: Generate Prisma client and setup database
         run: |
@@ -202,6 +221,20 @@ jobs:
           touch .env.production
           echo "DATABASE_URL=file:./build.db" >> .env.production
           echo "AUTH_SECRET=build-secret-key-minimum-32-chars" >> .env.production
+          echo "NEXTAUTH_SECRET=build-nextauth-secret-minimum-32-chars" >> .env.production
+          echo "NEXTAUTH_URL=http://localhost:3000" >> .env.production
+          echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_build" >> .env.production
+          echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_build" >> .env.production
+          echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_build" >> .env.production
+          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.production
+          echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_build" >> .env.production
+          echo "FROM_EMAIL=build@example.com" >> .env.production
+          echo "RESEND_API_KEY=build_resend_api_key" >> .env.production
+          echo "AWS_ACCESS_KEY_ID=build_aws_access_key" >> .env.production
+          echo "AWS_SECRET_ACCESS_KEY=build_aws_secret_key" >> .env.production
+          echo "AWS_REGION=us-east-1" >> .env.production
+          echo "S3_USER_BUCKET=build-bucket" >> .env.production
+          echo "NEXT_PUBLIC_CLOUDFRONT_PUBLIC_URL=https://build.cloudfront.net" >> .env.production
 
       - name: Generate Prisma client
         run: npx prisma generate --schema=prisma/schema.ci.prisma
