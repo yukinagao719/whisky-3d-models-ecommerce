@@ -20,8 +20,11 @@ async function cleanupTestDatabase() {
   try {
     console.log('🧹 Cleaning up test database...');
 
-    // Clean up all test data
-    await prisma.purchase.deleteMany();
+    // Clean up all test data in proper order (respecting foreign key constraints)
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.token.deleteMany();
+    await prisma.account.deleteMany();
     await prisma.user.deleteMany();
     await prisma.product.deleteMany();
 

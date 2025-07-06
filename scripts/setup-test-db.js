@@ -19,8 +19,11 @@ async function setupTestDatabase() {
   try {
     console.log('🗄️  Setting up test database...');
 
-    // Clean up existing data
-    await prisma.purchase.deleteMany();
+    // Clean up existing data in proper order
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.token.deleteMany();
+    await prisma.account.deleteMany();
     await prisma.user.deleteMany();
     await prisma.product.deleteMany();
 
@@ -29,37 +32,36 @@ async function setupTestDatabase() {
       prisma.product.create({
         data: {
           name: 'Test Whiskey 1',
-          slug: 'test-whiskey-1',
+          nameEn: 'Test Whiskey 1',
           description: 'A premium test whiskey for E2E testing',
           price: 12000,
+          displayOrder: 1,
+          imageUrl: '/images/test-whiskey-1.jpg',
           modelUrl: '/models/test-bottle-1.glb',
-          images: ['/images/test-whiskey-1.jpg'],
-          featured: true,
-          inStock: true,
+          videoUrl: '/videos/test-whiskey-1.mp4',
         }
       }),
       prisma.product.create({
         data: {
-          name: 'Test Whiskey 2', 
-          slug: 'test-whiskey-2',
+          name: 'Test Whiskey 2',
+          nameEn: 'Test Whiskey 2',
           description: 'Another premium test whiskey',
           price: 15000,
+          displayOrder: 2,
+          imageUrl: '/images/test-whiskey-2.jpg',
           modelUrl: '/models/test-bottle-2.glb',
-          images: ['/images/test-whiskey-2.jpg'],
-          featured: false,
-          inStock: true,
+          videoUrl: '/videos/test-whiskey-2.mp4',
         }
       }),
       prisma.product.create({
         data: {
           name: 'Out of Stock Whiskey',
-          slug: 'out-of-stock-whiskey',
+          nameEn: 'Out of Stock Whiskey',
           description: 'This whiskey is out of stock for testing',
           price: 18000,
+          displayOrder: 3,
+          imageUrl: '/images/test-whiskey-3.jpg',
           modelUrl: '/models/test-bottle-3.glb',
-          images: ['/images/test-whiskey-3.jpg'],
-          featured: false,
-          inStock: false,
         }
       })
     ]);
@@ -74,7 +76,7 @@ async function setupTestDatabase() {
         data: {
           name: 'Test User',
           email: 'test@example.com',
-          password: hashedPassword,
+          hashedPassword: hashedPassword,
           emailVerified: new Date(),
         }
       }),
@@ -82,7 +84,7 @@ async function setupTestDatabase() {
         data: {
           name: 'Test Admin',
           email: 'admin@example.com', 
-          password: hashedPassword,
+          hashedPassword: hashedPassword,
           emailVerified: new Date(),
         }
       })
@@ -90,24 +92,36 @@ async function setupTestDatabase() {
 
     console.log(`✅ Created ${users.length} test users`);
 
-    // Create test purchases
-    const purchases = await Promise.all([
-      prisma.purchase.create({
+    // Create test orders
+    const orders = await Promise.all([
+      prisma.order.create({
         data: {
           userId: users[0].id,
-          productId: products[0].id,
-          sessionId: 'test_session_1',
+          orderEmail: users[0].email,
+          orderNumber: 'TEST-001',
+          status: 'COMPLETED',
+          totalAmount: products[0].price,
+          isPaid: true,
+          paidAt: new Date(),
+          items: {
+            create: {
+              productId: products[0].id,
+              name: products[0].name,
+              nameEn: products[0].nameEn,
+              price: products[0].price,
+            }
+          }
         }
       })
     ]);
 
-    console.log(`✅ Created ${purchases.length} test purchases`);
+    console.log(`✅ Created ${orders.length} test orders`);
 
     console.log('🎉 Test database setup completed successfully!');
     console.log('\nTest Data Summary:');
     console.log(`- Products: ${products.length}`);
     console.log(`- Users: ${users.length}`);
-    console.log(`- Purchases: ${purchases.length}`);
+    console.log(`- Orders: ${orders.length}`);
     console.log('\nTest User Credentials:');
     console.log('Email: test@example.com');
     console.log('Password: testpassword123');
