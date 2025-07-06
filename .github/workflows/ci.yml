@@ -81,8 +81,9 @@ jobs:
       - name: Setup test database
         run: |
           touch .env.test
+          echo "POSTGRES_PRISMA_URL=file:./test.db" >> .env.test
           echo "DATABASE_URL=file:./test.db" >> .env.test
-          echo "AUTH_SECRET=test-secret-key-for-ci" >> .env.test
+          echo "AUTH_SECRET=test-secret-key-for-ci-minimum-32-chars" >> .env.test
 
       - name: Generate Prisma client
         run: npx prisma generate
@@ -124,6 +125,7 @@ jobs:
         run: |
           cp .env.test.example .env.test
           echo "APP_URL=http://localhost:3000" >> .env.test
+          echo "POSTGRES_PRISMA_URL=file:./test.db" >> .env.test
           echo "DATABASE_URL=file:./test.db" >> .env.test
           echo "AUTH_SECRET=test-secret-key-for-ci-minimum-32-chars" >> .env.test
           echo "NEXTAUTH_URL=http://localhost:3000" >> .env.test
@@ -197,8 +199,9 @@ jobs:
       - name: Setup build environment
         run: |
           touch .env.production
+          echo "POSTGRES_PRISMA_URL=file:./build.db" >> .env.production
           echo "DATABASE_URL=file:./build.db" >> .env.production
-          echo "AUTH_SECRET=build-secret-key" >> .env.production
+          echo "AUTH_SECRET=build-secret-key-minimum-32-chars" >> .env.production
 
       - name: Generate Prisma client
         run: npx prisma generate
