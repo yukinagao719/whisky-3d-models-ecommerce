@@ -75,52 +75,65 @@ const routeConfig: Record<ProtectedRoute, ProtectionType> = {
   '/api/account/update-avatar': 'rateLimitedAvatarUpdate',
 };
 
-const redis = Redis.fromEnv();
+// Redis初期化（レート制限が有効な場合のみ）
+let redis: any = null;
+let rateLimiters: any = {};
 
-const rateLimiters = {
-  signup: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.signup.maxAttempts,
-      `${RATE_LIMITS.signup.windowMs}ms`
-    ),
-  }),
-  passwordReset: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.passwordReset.maxAttempts,
-      `${RATE_LIMITS.passwordReset.windowMs}ms`
-    ),
-  }),
-  emailCheck: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.emailCheck.maxAttempts,
-      `${RATE_LIMITS.emailCheck.windowMs}ms`
-    ),
-  }),
-  checkout: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.checkout.maxAttempts,
-      `${RATE_LIMITS.checkout.windowMs}ms`
-    ),
-  }),
-  download: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.download.maxAttempts,
-      `${RATE_LIMITS.download.windowMs}ms`
-    ),
-  }),
-  avatarUpdate: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.avatarUpdate.maxAttempts,
-      `${RATE_LIMITS.avatarUpdate.windowMs}ms`
-    ),
-  }),
-};
+const RATE_LIMIT_ENABLED = process.env.RATE_LIMIT_ENABLED === 'true';
+
+if (RATE_LIMIT_ENABLED) {
+  try {
+    redis = Redis.fromEnv();
+    rateLimiters = {
+      signup: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          RATE_LIMITS.signup.maxAttempts,
+          `${RATE_LIMITS.signup.windowMs}ms`
+        ),
+      }),
+      passwordReset: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          RATE_LIMITS.passwordReset.maxAttempts,
+          `${RATE_LIMITS.passwordReset.windowMs}ms`
+        ),
+      }),
+      emailCheck: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          RATE_LIMITS.emailCheck.maxAttempts,
+          `${RATE_LIMITS.emailCheck.windowMs}ms`
+        ),
+      }),
+      checkout: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          RATE_LIMITS.checkout.maxAttempts,
+          `${RATE_LIMITS.checkout.windowMs}ms`
+        ),
+      }),
+      download: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          RATE_LIMITS.download.maxAttempts,
+          `${RATE_LIMITS.download.windowMs}ms`
+        ),
+      }),
+      avatarUpdate: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          RATE_LIMITS.avatarUpdate.maxAttempts,
+          `${RATE_LIMITS.avatarUpdate.windowMs}ms`
+        ),
+      }),
+    };
+  } catch (error) {
+    console.warn('Redis initialization failed, disabling rate limiting:', error);
+    redis = null;
+    rateLimiters = {};
+  }
+}
 
 // 有効なセッションが存在するか判定する関数
 function hasValidSession(request: NextRequest) {
@@ -148,8 +161,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // レート制限が無効な場合はスキップ
-  if (!RATE_LIMIT_ENABLED) {
+  // レート制限が無効またはrateLimitersが初期化されていない場合はスキップ
+  if (!RATE_LIMIT_ENABLED || !redis || Object.keys(rateLimiters).length === 0) {
     return NextResponse.next();
   }
 

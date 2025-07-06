@@ -97,7 +97,7 @@ jobs:
           echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_build" >> .env.production
           echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_build" >> .env.production
           echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_build" >> .env.production
-          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.production
+          echo "UPSTASH_REDIS_REST_URL=https://dummy-redis-rest-url.upstash.io" >> .env.production
           echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_build" >> .env.production
           echo "FROM_EMAIL=build@example.com" >> .env.production
           echo "RESEND_API_KEY=build_resend_api_key" >> .env.production
@@ -111,9 +111,10 @@ jobs:
         run: npx prisma generate --schema=prisma/schema.ci.prisma
 
       - name: Build and analyze bundle
-        run: npm run analyze
+        run: NODE_ENV=production npm run analyze
         env:
           SKIP_ENV_VALIDATION: true
+          RATE_LIMIT_ENABLED: false
 
       - name: Comment bundle size
         uses: andresz1/size-limit-action@v1
@@ -150,7 +151,7 @@ jobs:
           echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_lighthouse" >> .env.test
           echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_lighthouse" >> .env.test
           echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_lighthouse" >> .env.test
-          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.test
+          echo "UPSTASH_REDIS_REST_URL=https://dummy-redis-rest-url.upstash.io" >> .env.test
           echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_lighthouse" >> .env.test
           echo "FROM_EMAIL=lighthouse@example.com" >> .env.test
           echo "RESEND_API_KEY=lighthouse_resend_api_key" >> .env.test
@@ -168,11 +169,12 @@ jobs:
 
       - name: Build and start application
         run: |
-          npm run build
+          NODE_ENV=production npm run build
           npm start &
           sleep 30 # Wait for app to start
         env:
           SKIP_ENV_VALIDATION: true
+          RATE_LIMIT_ENABLED: false
 
       - name: Run Lighthouse
         uses: treosh/lighthouse-ci-action@v10

@@ -42,15 +42,28 @@ const AUTH_RATE_LIMIT = {
   maxAttempts: 5,
 } as const;
 
-const redis = Redis.fromEnv();
+// Redis初期化（レート制限が有効な場合のみ）
+let redis: any = null;
+let ratelimit: any = null;
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(
-    AUTH_RATE_LIMIT.maxAttempts,
-    `${AUTH_RATE_LIMIT.windowMs}ms`
-  ),
-});
+const RATE_LIMIT_ENABLED = process.env.RATE_LIMIT_ENABLED === 'true';
+
+if (RATE_LIMIT_ENABLED) {
+  try {
+    redis = Redis.fromEnv();
+    ratelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(
+        AUTH_RATE_LIMIT.maxAttempts,
+        `${AUTH_RATE_LIMIT.windowMs}ms`
+      ),
+    });
+  } catch (error) {
+    console.warn('Redis initialization failed, disabling rate limiting:', error);
+    redis = null;
+    ratelimit = null;
+  }
+}
 
 // 認証プロバイダーの設定
 const providers = {
@@ -114,7 +127,7 @@ const providers = {
         }
 
         // ④レート制限のチェック（１５分間に５回まで）
-        if (RATE_LIMIT_ENABLED) {
+        if (RATE_LIMIT_ENABLED && ratelimit) {
           const forwardedFor = request?.headers?.get?.('x-forwarded-for');
           const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
           const { success } = await ratelimit.limit(

@@ -87,7 +87,7 @@ jobs:
           echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_unit" >> .env.test
           echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_unit" >> .env.test
           echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_unit" >> .env.test
-          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.test
+          echo "UPSTASH_REDIS_REST_URL=https://dummy-redis-rest-url.upstash.io" >> .env.test
           echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_unit" >> .env.test
 
       - name: Generate Prisma client
@@ -138,7 +138,7 @@ jobs:
           echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_e2e" >> .env.test
           echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_e2e" >> .env.test
           echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_e2e" >> .env.test
-          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.test
+          echo "UPSTASH_REDIS_REST_URL=https://dummy-redis-rest-url.upstash.io" >> .env.test
           echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_e2e" >> .env.test
           echo "FROM_EMAIL=test@example.com" >> .env.test
           echo "RESEND_API_KEY=test_resend_api_key" >> .env.test
@@ -158,9 +158,10 @@ jobs:
         run: |
           # Skip database migration for CI build
           npx prisma generate --schema=prisma/schema.ci.prisma
-          npx next build
+          NODE_ENV=production npx next build
         env:
           SKIP_ENV_VALIDATION: true
+          RATE_LIMIT_ENABLED: false
 
       - name: Start application in background
         run: |
@@ -226,7 +227,7 @@ jobs:
           echo "STRIPE_SECRET_KEY=sk_test_dummy_key_for_build" >> .env.production
           echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy_key_for_build" >> .env.production
           echo "STRIPE_WEBHOOK_SECRET=whsec_dummy_key_for_build" >> .env.production
-          echo "UPSTASH_REDIS_REST_URL=redis://localhost:6379" >> .env.production
+          echo "UPSTASH_REDIS_REST_URL=https://dummy-redis-rest-url.upstash.io" >> .env.production
           echo "UPSTASH_REDIS_REST_TOKEN=dummy_token_for_build" >> .env.production
           echo "FROM_EMAIL=build@example.com" >> .env.production
           echo "RESEND_API_KEY=build_resend_api_key" >> .env.production
@@ -243,9 +244,10 @@ jobs:
         run: |
           # Skip database operations for build check
           npx prisma generate --schema=prisma/schema.ci.prisma
-          npx next build
+          NODE_ENV=production npx next build
         env:
           SKIP_ENV_VALIDATION: true
+          RATE_LIMIT_ENABLED: false
 
   # Deploy to Vercel (only on main branch)
   deploy:
