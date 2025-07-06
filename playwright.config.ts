@@ -1,6 +1,7 @@
-import { defineConfig, devices } from '@playwright/test';
+// @ts-check
+const { defineConfig, devices } = require('@playwright/test');
 
-export default defineConfig({
+module.exports = defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
