@@ -81,13 +81,11 @@ jobs:
       - name: Setup test database
         run: |
           touch .env.test
-          echo "POSTGRES_PRISMA_URL=file:./test.db" >> .env.test
-          echo "POSTGRES_URL_NON_POOLING=file:./test.db" >> .env.test
           echo "DATABASE_URL=file:./test.db" >> .env.test
           echo "AUTH_SECRET=test-secret-key-for-ci-minimum-32-chars" >> .env.test
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: npx prisma generate --schema=prisma/schema.ci.prisma
 
       - name: Run unit tests
         run: npm run test:ci
@@ -126,8 +124,6 @@ jobs:
         run: |
           cp .env.test.example .env.test
           echo "APP_URL=http://localhost:3000" >> .env.test
-          echo "POSTGRES_PRISMA_URL=file:./test.db" >> .env.test
-          echo "POSTGRES_URL_NON_POOLING=file:./test.db" >> .env.test
           echo "DATABASE_URL=file:./test.db" >> .env.test
           echo "AUTH_SECRET=test-secret-key-for-ci-minimum-32-chars" >> .env.test
           echo "NEXTAUTH_URL=http://localhost:3000" >> .env.test
@@ -135,12 +131,15 @@ jobs:
 
       - name: Generate Prisma client and setup database
         run: |
-          npx prisma generate
-          npx prisma db push
+          npx prisma generate --schema=prisma/schema.ci.prisma
+          npx prisma db push --schema=prisma/schema.ci.prisma --accept-data-loss
           npm run test:setup
 
       - name: Build application
-        run: npm run build
+        run: |
+          # Skip database migration for CI build
+          npx prisma generate --schema=prisma/schema.ci.prisma
+          npx next build
         env:
           SKIP_ENV_VALIDATION: true
 
@@ -201,16 +200,17 @@ jobs:
       - name: Setup build environment
         run: |
           touch .env.production
-          echo "POSTGRES_PRISMA_URL=file:./build.db" >> .env.production
-          echo "POSTGRES_URL_NON_POOLING=file:./build.db" >> .env.production
           echo "DATABASE_URL=file:./build.db" >> .env.production
           echo "AUTH_SECRET=build-secret-key-minimum-32-chars" >> .env.production
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: npx prisma generate --schema=prisma/schema.ci.prisma
 
       - name: Build application
-        run: npm run build
+        run: |
+          # Skip database operations for build check
+          npx prisma generate --schema=prisma/schema.ci.prisma
+          npx next build
         env:
           SKIP_ENV_VALIDATION: true
 
