@@ -1,229 +1,234 @@
-# 3D/WHISKY E-commerce
+# 3D Whisky E-commerce
 
-## 【概要】
+ウイスキーの3Dモデルを閲覧・購入できるモダンなECサイトです。
+React Three Fiberを使用したインタラクティブな3Dビューワーで、商品を360度回転させながら詳細を確認できます。
 
-ウイスキーの3Dモデルを閲覧・購入できるECサイトです。3Dモデルをインタラクティブに操作しながら、商品の詳細を確認できます。
+⚠️ **注意**: このサイトはポートフォリオ用のデモサイトです。実際の商取引は行えません。
 
-⚠️ **注意**： このサイトはポートフォリオ用のデモサイトです。実際の商取引は行えません。Stripeの決済機能はテストモードで実装されています。
+🌐 **デモサイト**: [3D/WHISKY](https://3dwhiskyshop.com/)
 
-## 【URL】
+## ✨ 主な機能
 
-**URL**： [3D/WHISKY](https://3dwhiskyshop.com/)
+### 🔐 認証・アカウント管理
 
-## 【機能】
+- **マルチプロバイダー認証**: OAuth（Google, GitHub）とメール/パスワード認証
+- **プロフィール管理**: アバター画像、表示名の編集
+- **購入履歴**: 注文詳細とダウンロードリンクの管理
+- **ゲスト購入**: アカウント不要での購入対応
 
-### （認証・アカウント）
+### 🛒 EC機能
 
-- OAuth認証（Google, GitHub）
-- メール/パスワード認証
-- アカウント管理（プロフィール編集、購入履歴）
-- ゲスト購入
+- **3Dモデルビューワー**: React Three Fiberによるインタラクティブな商品閲覧
+- **カート機能**: 商品の追加・削除・数量管理
+- **決済処理**: Stripe統合によるセキュアな決済（テストモード）
+- **購入後ダウンロード**: 期限付きトークンによる安全なファイル配信
 
-### （EC機能）
+### 🔒 セキュリティ・パフォーマンス
 
-- 3Dモデルビューワー（React Three Fiber）
-- カート機能
-- Stripe決済（テストモード）
-- 購入履歴
+- **入力値検証**: Zodを使用した厳密な型チェック
+- **レート制限**: API呼び出し頻度の制御（Redis使用）
+- **コンテンツ保護**: CloudFront署名付きURLによるプライベートファイル配信
+- **CSP対応**: Content Security Policyによる攻撃防御
+- **エラーハンドリング**: 包括的なエラー処理とログ記録
 
-### （セキュリティ）
+## 🛠 技術スタック
 
-- 入力値バリデーション
-- レート制限（サインアップ、ダウンロードなど）
-- エラーハンドリング
-- XSS/CSRF対策
-- CloudFront署名付きURLによるプライベートコンテンツ保護
-  - 開発環境と本番環境で分離された鍵管理
-  - AWS Secrets Managerでの安全な秘密鍵の管理
+### Frontend
 
-## 【技術スタック】
+- **TypeScript** - 型安全な開発環境
+- **Next.js 14** - App Routerによるモダンなフルスタックフレームワーク
+- **React Three Fiber** - 3Dグラフィックスレンダリング
+- **Zustand** - 軽量状態管理
+- **Tailwind CSS** - ユーティリティファーストCSS
 
-### （フロントエンド）
+### Backend & API
 
-- TypeScript
-- Next.js (App Router)
-- React Three Fiber / Three.js
-- Zustand
-- Tailwind CSS
+- **Next.js API Routes** - サーバーレスAPI
+- **Auth.js** - 認証ライブラリ
+- **Stripe** - 決済処理
+- **Prisma** - データベースORM
 
-### （バックエンド）
+### Database & Cache
 
-- Node.js
-- Next.js API Routes
-- Auth.js
-- Stripe
+- **Neon (Vercel Postgres)** - クラウドPostgreSQL
+- **Upstash Redis** - レート制限・キャッシュ
 
-### （データベース）
+### Infrastructure
 
-- Neon (Vercel Postgres)
-- Prisma
-- Upstash Redis
+- **Vercel** - ホスティング・デプロイ
+- **AWS S3** - ファイルストレージ
+- **AWS CloudFront** - CDN・コンテンツ配信
 
-### （インフラ）
+### Development Tools
 
-- AWS (S3, CloudFront)
-- Vercel
+- **ESLint** - コード品質管理
+- **Prettier** - コードフォーマット
+- **Playwright** - E2Eテスト
 
-### （開発ツール）
+## 🎯 デモ環境・テスト情報
 
-- ESLint
-- Prettier
+### 🔑 デモアカウント
 
-## 【デモ環境について】
+デモアカウント情報については**お問い合わせください**。
 
-### （デモアカウント）
+### ✅ デモ環境で確認可能な機能
 
-デモアカウント情報は採用担当者様に直接共有させていただきます。
+#### 認証・アカウント機能
 
-### （デモ環境で確認可能な機能）
+- ✅ メール/パスワードでのログイン・ログアウト
+- ✅ プロフィール編集（アバター画像・表示名変更）
+- ✅ 購入履歴の確認
+- ✅ アカウント削除
 
-1. **基本認証機能**
+#### EC機能
 
-   - メール/パスワードでのログイン
-   - ログアウト
+- ✅ 3Dモデルのインタラクティブ操作
+- ✅ 商品閲覧・カート機能
+- ✅ Stripeテスト決済
+- ✅ 購入後ファイルダウンロード
 
-2. **アカウント管理**
+### ⚠️ デモ環境での制限事項
 
-   - プロフィール変更（アバター画像、表示名）
-   - 購入履歴の確認
-   - アカウントの削除
+**セキュリティとプライバシー保護のため、以下は制限されています：**
 
-3. **EC機能**
-   - 3Dモデル操作
-   - 商品の閲覧・カート操作
-   - テストカードでの決済
-   - 商品のダウンロード
+#### 認証関連
 
-### （デモ環境での制限事項）
+- ❌ OAuth認証（Google, GitHub）
+- ❌ 新規アカウント登録・メール認証
+- ❌ パスワードリセット機能
 
-以下の機能については、セキュリティとプライバシーの観点からデモ環境での確認が制限されています：
+#### その他の制限
 
-1. **認証関連**
+- ❌ ゲスト購入機能
+- ❌ レート制限の動作確認
+- ❌ メール通知システム
+- ❌ トークン期限切れ確認
 
-   - OAuth認証（Google, GitHub）
-   - 新規アカウント登録（メール認証）
-   - パスワードリセット
+### 💼 詳細デモンストレーション
 
-2. **その他の制限**
-   - ゲスト購入機能
-   - レート制限の確認
-   - メール通知システム
-   - ダウンロードトークンの有効期限確認（メール）
-     - 購入直後：有効なダウンロードリンク
-     - 期限切れ：1週間前の注文のダウンロードリンク
+**制限機能については実環境でのデモが可能です：**
 
-これらの機能については、**採用面接時に実環境での動作デモ**をさせていただきます。以下の項目について詳細な説明とデモンストレーションが可能です：
-
-- 実際のOAuth認証フロー
+- OAuth認証フローの実演
 - メール認証システムの動作
-- セキュリティ機能（レート制限など）の実装詳細
-- 本番環境でのメール通知システム
+- セキュリティ機能の詳細説明
+- ソースコード実装詳細の解説
 
-ソースコード内の実装詳細もご確認いただけます：
+### 💳 テスト決済情報
 
-- `auth.ts`: 認証設定
-- `middleware.ts`: レート制限の実装
-- `email.ts`: メール通知システム
+Stripeテストカード情報については**お問い合わせください**。
 
-## 【テスト用決済について】
+## ⚙️ 開発環境セットアップ
 
-テストカード情報は採用担当者様に直接共有させていただきます。
+### 📋 必要な環境変数
 
-## 【環境変数の設定】
-
-プロジェクトルートに`.env`ファイルを作成し、以下の環境変数を設定してください。
+プロジェクトルートに`.env`ファイルを作成し、以下を設定してください。
 
 ```env
-# アプリケーションのURL（開発環境の場合：http://localhost:3000）
-APP_URL=
+# アプリケーション基本設定
+APP_URL=http://localhost:3000
 
-# データベース接続URL（Neon -Vercel Postgres）
-POSTGRES_PRISMA_URL=
-POSTGRES_URL_NON_POOLING=
+# データベース（Neon - Vercel Postgres）
+POSTGRES_PRISMA_URL=your_postgres_url
+POSTGRES_URL_NON_POOLING=your_postgres_non_pooling_url
 
-# OAuth認証プロバイダーの認証情報
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GITHUB_ID=
-GITHUB_SECRET=
+# 認証（OAuth）
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GITHUB_ID=your_github_client_id
+GITHUB_SECRET=your_github_client_secret
+AUTH_SECRET=your_auth_secret  # openssl rand -base64 32
 
-# Auth.jsの暗号化キー（openssl rand -base64 32で生成可能）
-AUTH_SECRET=
+# メール送信（Resend）
+FROM_EMAIL=your_from_email
+RESEND_API_KEY=your_resend_api_key
 
-# メール送信設定
-FROM_EMAIL=
-RESEND_API_KEY=
+# 決済（Stripe）
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 
-# Stripe決済（開発時はテストモードのキーを使用）
-STRIPE_SECRET_KEY=
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_WEBHOOK_SECRET=
+# Redis（レート制限）
+UPSTASH_REDIS_REST_URL=your_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_redis_token
 
-# Upstash Redis（レート制限用）
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
+# AWS（ファイルストレージ）
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_REGION=ap-northeast-1
+S3_USER_BUCKET=your_s3_bucket
+NEXT_PUBLIC_CLOUDFRONT_PUBLIC_URL=your_cloudfront_url
+CLOUDFRONT_USER_URL=your_cloudfront_user_url
+CLOUDFRONT_PRIVATE_URL=your_cloudfront_private_url
+CLOUDFRONT_KEY_PAIR_ID=your_cloudfront_key_pair_id
 
-# AWS認証情報
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=
+# デモユーザー設定
+DEMO_USER_EMAIL=demo@3dwhisky.com
+DEMO_USER_PASSWORD=@Demo123
+DEMO_NEW_USER_EMAIL=new-demo@3dwhisky.com
+DEMO_NEW_USER_PASSWORD=@Demo123
 
-# AWS S3とCloudFrontの設定
-S3_USER_BUCKET=
-NEXT_PUBLIC_CLOUDFRONT_PUBLIC_URL=
-CLOUDFRONT_USER_URL=
-CLOUDFRONT_PRIVATE_URL=
-CLOUDFRONT_KEY_PAIR_ID=  # CloudFrontパブリックキーのID
-
-# レート制限の制御（true/false）
-RATE_LIMIT_ENABLED=
-
+# 機能制御
+RATE_LIMIT_ENABLED=true
 ```
 
-## 【今後の改善点】
+### 🚀 起動手順
 
-### （パフォーマンス最適化）
+```bash
+# 依存関係のインストール
+npm install
 
-- 3Dモデルのレンダリング最適化（モデル圧縮とキャッシュ戦略の改善）
+# データベースの初期化
+npx prisma generate
+npx prisma db push
+npx prisma db seed
 
-### （型安全性の強化）
+# 開発サーバーの起動
+npm run dev
 
-- APIレスポンスの型定義の実装
-- Zodを使用したランタイム型チェックの導入
+# Stripe webhookの起動（別ターミナル）
+stripe listen --forward-to localhost:3000/api/checkout/webhook
+```
 
-### （テスト実装）
+## 🔄 今後の改善計画
 
-- Jestを使用したユニットテスト導入
-- Playwrightなどによるe2eテスト実装
-- APIエンドポイントの統合テスト追加
+### 📈 パフォーマンス最適化
 
-### （セキュリティ強化）
+- 3Dモデルの圧縮・最適化
+- 画像の遅延読み込み・WebP対応
+- キャッシュ戦略の改善
 
-- Content Security Policy (CSP)の実装
-- XSS対策の強化
-- セキュリティヘッダーの最適化
+### 🧪 テスト拡張
 
-### （監視・分析）
+- ユニットテストカバレッジの向上
+- E2Eテストシナリオの追加（現在基本実装済み）
+- パフォーマンステストの実装
 
-- エラーログ収集システムの導入
-- パフォーマンスモニタリングの実装
+### 📊 監視・分析
 
-### （開発・デプロイメントフロー）
+- エラーログ収集システム（Sentry等）
+- リアルタイムパフォーマンス監視
+- ユーザー行動分析の導入
 
-- GitHub Actionsを使用したCI/CDパイプラインの構築
-- 自動テストとデプロイの統合
+### 🔧 開発効率化
 
-## 【コントリビューション】
+- GitHub Actions CI/CDパイプライン
+- 自動デプロイ・ロールバック機能
 
-このプロジェクトはポートフォリオ用のため、プルリクエストは受け付けていません。
-しかし、改善案やフィードバックはお受けいたします。
+---
 
-## 【ライセンス】
+## 📝 ライセンス
 
-[MIT License](LICENSE)
+このプロジェクトは [MIT License](LICENSE) の下で公開されています。
 
-## 【作者】
+## 👨‍💻 作者
 
-Yuki Nagao
+**Yuki Nagao**
 
-- GitHub: [@yukinagao719](https://github.com/yukinagao719)
+- 📧 Email: ynagao719@gmail.com
+- 🐙 GitHub: [@yukinagao719](https://github.com/yukinagao719)
+- 💼 LinkedIn: [Yuki Nagao](https://www.linkedin.com/in/yuki-nagao/)
+
+---
+
+> 💡 **フィードバック・ご質問について**  
+> このプロジェクトはポートフォリオ用途のため、プルリクエストは受け付けておりませんが、技術的なご質問やフィードバックは歓迎いたします。お気軽にご連絡ください。

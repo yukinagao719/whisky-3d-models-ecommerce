@@ -23,6 +23,7 @@ export async function GET() {
       where: {
         userId: session.user.id,
         isPaid: true,
+        status: 'COMPLETED',
       },
       select: {
         orderNumber: true,

@@ -8,7 +8,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/token';
-import { EmailType, sendPasswordResetEmail } from '@/lib/email';
+import { sendPasswordResetEmail } from '@/lib/email';
 import { validateEmail } from '@/utils/validation';
 
 type ResetPasswordRequest = {
@@ -70,12 +70,11 @@ export async function POST(request: Request) {
       );
 
       // 3. パスワードリセットメールを送信
-      const emailResult = await sendPasswordResetEmail({
-        type: EmailType.RESET,
-        email: normalizedEmail,
-        token: resetToken.token,
-        baseUrl: process.env.APP_URL || '',
-      });
+      const emailResult = await sendPasswordResetEmail(
+        normalizedEmail,
+        resetToken.token,
+        process.env.APP_URL || ''
+      );
 
       if (!emailResult.success) {
         console.error('Failed to send reset email:', emailResult.error);

@@ -1,9 +1,9 @@
 import { TokenType } from '@prisma/client';
 import { hash } from 'bcryptjs';
 import crypto from 'crypto';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../src/lib/prisma';
 import productsData from './data/products.json';
-import { DEMO_USER_IDS } from '@/lib/demo';
+import { DEMO_USER_IDS } from '../src/lib/demo';
 
 // 商品データの型定義
 type ProductSeedData = {

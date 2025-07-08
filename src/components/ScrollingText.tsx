@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { debounce } from 'lodash';
+import { debounce } from '@/utils/debounce';
 
 // デバイスサイズに応じたテキスト繰り返し回数の定義
 const REPEAT_COUNT = {

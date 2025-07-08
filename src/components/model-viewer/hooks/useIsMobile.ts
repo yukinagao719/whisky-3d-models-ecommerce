@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { debounce } from 'lodash';
+import { debounce } from '@/utils/debounce';
 
 // デバイスがモバイルサイズかどうかを判定するカスタムフック
 export function useIsMobile() {

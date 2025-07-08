@@ -24,7 +24,7 @@ const createDownloadToken = (
 
 // デモユーザー情報を取得する関数
 const getDemoUsers = async () => {
-  const headersList = await headers();
+  const headersList = headers();
   const host = headersList.get('host');
   const isDevelopment =
     host?.includes('localhost') || host?.includes('127.0.0.1');

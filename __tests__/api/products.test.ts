@@ -1,4 +1,4 @@
-import { createMocks } from 'node-mocks-http';
+// API logic tests for products and purchases
 
 // Mock Prisma client
 jest.mock('@/lib/prisma', () => ({

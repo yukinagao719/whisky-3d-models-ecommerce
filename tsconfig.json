@@ -35,13 +35,17 @@
   "include": [
     "next-env.d.ts",
     "global.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "playwright.config.ts",
-    "tests/**/*"
+    "tests/**",
+    "**/*.spec.ts",
+    "**/e2e/**"
   ]
 }
