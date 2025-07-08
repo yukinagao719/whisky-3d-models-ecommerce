@@ -6,6 +6,8 @@
  * - 未ログインユーザーのチェックアウトフロー
  */
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -296,7 +298,48 @@ export default function CartPage() {
                     />
                   </div>
                 ) : status === 'unauthenticated' ? (
-                  // メールアドレス入力フォーム
+                  // ゲスト購入フォーム（ポートフォリオサイトのため無効化）
+                  <div className="relative group">
+                    <div className="opacity-50">
+                      <div className="mb-4">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-gray-300 mb-2"
+                        >
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={true}
+                          required
+                          maxLength={EMAIL_VALIDATION.MAX_LENGTH}
+                          pattern={EMAIL_VALIDATION.REGEX.source}
+                          className="w-full p-3 bg-background-primary border border-gray-600 rounded text-text-primary focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="We'll send you a confirmation email"
+                          autoComplete="email"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        disabled={true}
+                        className="w-full mt-6 bg-accent-dark hover:bg-accent-light px-8 py-4 rounded-lg transition-all transform hover:scale-105 font-medium text-text-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
+                      </button>
+                    </div>
+                    
+                    {/* ツールチップ */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-3 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
+                      ポートフォリオサイトのためログインが必要です
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                    </div>
+                  </div>
+                  
+                  /* 元の実装（実装コード確認用）
                   <form onSubmit={handleGuestCheckout}>
                     <div className="mb-4">
                       <label
@@ -327,6 +370,7 @@ export default function CartPage() {
                       {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
                     </button>
                   </form>
+                  */
                 ) : (
                   // チェックアウトボタン
                   <button
