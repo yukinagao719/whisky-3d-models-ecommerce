@@ -4,6 +4,8 @@
  * - 冪等性制御：タイムスタンプとカート内容に基づくキー生成
  */
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import Stripe from 'stripe';
@@ -28,9 +30,32 @@ function getStripeImageUrls(imageUrl: string): string[] {
 
 export async function POST(request: Request) {
   try {
-    // ①リクエストデータの検証
+    // ①認証状態の確認
+    const session = await auth();
     const { items, email } = (await request.json()) as CheckoutRequest;
 
+    // ポートフォリオサイトのためゲスト購入を制限
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'ポートフォリオサイトのためログインが必要です' },
+        { status: 403 }
+      );
+    }
+
+    /* 元の実装（実装コード確認用）
+    // 認証済みユーザーとゲストユーザーの両方に対応した処理
+    const session = await auth();
+    
+    // ゲストユーザーの場合はemailパラメータが必要
+    if (!session?.user?.id && !email) {
+      return NextResponse.json(
+        { error: 'メールアドレスが必要です' },
+        { status: 400 }
+      );
+    }
+    */
+
+    // ②リクエストデータの検証
     if (!items.length) {
       return NextResponse.json({ error: 'カートが空です' }, { status: 400 });
     }
@@ -87,16 +112,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // ④Stripeセッションの作成
-    const session = await auth();
-
-    // ⑤冪等性キーの生成
+    // ④冪等性キーの生成
     const idempotencyKey = uuidv4();
 
     const sessionOptions: Stripe.Checkout.SessionCreateParams = {
       client_reference_id: session?.user?.id,
       payment_method_types: ['card'],
-      customer_email: email,
+      customer_email: session?.user?.email || undefined,
       line_items: productsFromDB.map((product) => ({
         price_data: {
           currency: 'jpy',

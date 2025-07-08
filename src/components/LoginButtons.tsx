@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { useEffect, useState } from 'react';
 import { getProviders, signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -28,7 +30,6 @@ export default function LoginButtons() {
   const [providers, setProviders] = useState<Record<string, Provider> | null>(
     null
   );
-  const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [error, setError] = useState<ErrorMessage | null>(null);
 
   // 認証プロバイダー一覧の取得と初期化
@@ -61,9 +62,12 @@ export default function LoginButtons() {
     }
   };
 
-  // OAuth認証の実行とリダイレクト処理
-  // - チェックアウトフローの場合は特別な処理を実行
-  // - エラー発生時はログインページにリダイレクト
+  // ポートフォリオサイトのためOAuth認証を無効化
+  const handleOAuthSignIn = () => {
+    // OAuth認証は無効化されています
+  };
+
+  /* 元の実装（実装コード確認用）
   const handleOAuthSignIn = async (providerId: string) => {
     try {
       setLoadingProvider(providerId);
@@ -99,6 +103,7 @@ export default function LoginButtons() {
       setLoadingProvider(null);
     }
   };
+  */
 
   // エラー内容を表示;
   if (error) {
@@ -122,25 +127,26 @@ export default function LoginButtons() {
           const IconComponent = getProviderIcon(provider.id);
           if (!IconComponent || provider.id === 'credentials') return null;
 
-          const isProviderLoading = loadingProvider === provider.id;
-
           return (
             <div key={provider.id} className="text-center">
-              <button
-                aria-label={`${provider.name}でログイン`}
-                onClick={() => handleOAuthSignIn(provider.id)}
-                disabled={loadingProvider !== null}
-                className="bg-background-secondary shadow-md shadow-gray-700 duration-300 hover:translate-y-1 hover:shadow-none text-text-primary font-bold py-2 px-4 rounded flex items-center justify-center w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                type="button"
-              >
-                <IconComponent aria-hidden="true" />
-
-                <span className="ml-5">
-                  {isProviderLoading
-                    ? `Logging in with ${provider.name}...`
-                    : `Login with ${provider.name}`}
-                </span>
-              </button>
+              <div className="relative group">
+                <button
+                  aria-label={`${provider.name}でログイン（無効化済み）`}
+                  onClick={handleOAuthSignIn}
+                  disabled={true}
+                  className="bg-background-secondary opacity-50 shadow-md shadow-gray-700 text-text-primary font-bold py-2 px-4 rounded flex items-center justify-center w-full cursor-not-allowed"
+                  type="button"
+                >
+                  <IconComponent aria-hidden="true" />
+                  <span className="ml-5">Login with {provider.name}</span>
+                </button>
+                
+                {/* ツールチップ */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                  ポートフォリオサイトのため無効化されています
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </div>
             </div>
           );
         })}

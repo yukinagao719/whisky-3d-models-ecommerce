@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -119,8 +121,9 @@ export default function ConfirmPasswordResetPage({
             </div>
           </div>
         ) : (
-          // パスワードリセットフォーム
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          // パスワードリセットフォーム（ポートフォリオサイトのため無効化）
+          <div className="relative group">
+            <form onSubmit={(e) => e.preventDefault()} className="mt-8 space-y-6 opacity-50">
             {/* エラー表示 */}
             {error && (
               <div
@@ -152,7 +155,7 @@ export default function ConfirmPasswordResetPage({
                   onChange={(e) => setPassword(e.target.value)}
                   className="mt-1 appearance-none rounded relative block w-full px-3 py-2 border border-gray-600 bg-background-secondary text-text-primary focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Enter new password"
-                  disabled={isLoading}
+                  disabled={true}
                 />
 
                 {/* パスワード表示/非表示切り替えボタン */}
@@ -241,6 +244,13 @@ export default function ConfirmPasswordResetPage({
               </Link>
             </div>
           </form>
+          
+          {/* ツールチップ */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-3 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 pointer-events-none">
+            ポートフォリオサイトのためパスワードリセット機能は無効化されています
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+          </div>
+        </div>
         )}
       </div>
     </main>
