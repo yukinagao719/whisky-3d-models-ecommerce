@@ -162,10 +162,10 @@ CLOUDFRONT_PRIVATE_URL=your_cloudfront_private_url
 CLOUDFRONT_KEY_PAIR_ID=your_cloudfront_key_pair_id
 
 # デモユーザー設定
-DEMO_USER_EMAIL=demo@3dwhisky.com
-DEMO_USER_PASSWORD=@Demo123
-DEMO_NEW_USER_EMAIL=new-demo@3dwhisky.com
-DEMO_NEW_USER_PASSWORD=@Demo123
+DEMO_USER_EMAIL=your_demo_email
+DEMO_USER_PASSWORD=your_demo_password
+DEMO_NEW_USER_EMAIL=your_new_demo_email
+DEMO_NEW_USER_PASSWORD=your_new_demo_password
 
 # 機能制御
 RATE_LIMIT_ENABLED=true
@@ -226,7 +226,6 @@ stripe listen --forward-to localhost:3000/api/checkout/webhook
 
 - 📧 Email: ynagao719@gmail.com
 - 🐙 GitHub: [@yukinagao719](https://github.com/yukinagao719)
-- 💼 LinkedIn: [Yuki Nagao](https://www.linkedin.com/in/yuki-nagao/)
 
 ---
 

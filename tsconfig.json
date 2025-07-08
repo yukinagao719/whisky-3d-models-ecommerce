@@ -37,15 +37,14 @@
     "global.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "__tests__/**/*.ts",
-    "__tests__/**/*.tsx",
+    "tests/unit/**/*.ts",
+    "tests/unit/**/*.tsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "playwright.config.ts",
-    "tests/**",
-    "**/*.spec.ts",
-    "**/e2e/**"
+    "tests/e2e/**",
+    "**/*.spec.ts"
   ]
 }
