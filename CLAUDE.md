@@ -14,6 +14,7 @@ npm run dev          # Start Next.js development server
 
 # Testing
 npm test             # Run unit tests (Jest)
+npm run test:watch   # Run tests in watch mode
 npm run test:coverage # Run tests with coverage report
 npm run test:ci      # CI-optimized test run
 
@@ -31,6 +32,14 @@ npm run demo:reset   # Force reset database for demo
 npx prisma generate  # Generate Prisma client
 npx prisma migrate deploy # Apply migrations
 npx prisma db seed   # Seed database with test data
+npx prisma studio    # Open Prisma Studio for database inspection
+```
+
+### Stripe Development
+```bash
+# Webhook testing (requires Stripe CLI)
+stripe listen --forward-to localhost:3000/api/checkout/webhook
+stripe login  # Authenticate with correct Stripe account
 ```
 
 ## High-Level Architecture
@@ -63,8 +72,9 @@ This is a **Next.js 14 App Router** e-commerce application for 3D whisky models 
 
 **Security Layers**:
 - Rate limiting on authentication endpoints and downloads
-- Input validation using custom utility functions
+- Input validation using custom utility functions  
 - CloudFront signed URLs for protecting premium 3D model files
+- Content Security Policy (CSP) configured for Stripe and Vercel Live compatibility
 - Comprehensive error handling with user-friendly messages
 
 ### Important Configuration Files
@@ -74,6 +84,8 @@ This is a **Next.js 14 App Router** e-commerce application for 3D whisky models 
 **Middleware**: `src/middleware.ts` - Rate limiting and route protection (simplified from 321 to 210 lines)
 **Email System**: `src/lib/email.ts` - Template-based email system (simplified from 357 to 217 lines)
 **Validation**: `src/utils/validation.ts` - Input validation utilities (simplified from 137 to 111 lines)
+**CSP Security**: `next.config.mjs` - Content Security Policy headers for Stripe and Vercel Live
+**Stripe Config**: `src/lib/stripe-server.ts` - Uses API version 2025-01-27.acacia for webhook compatibility
 
 ### Development Notes
 
@@ -89,10 +101,14 @@ This is a **Next.js 14 App Router** e-commerce application for 3D whisky models 
 
 ## Critical Paths for Development
 
-When modifying authentication flows, always update both `src/auth.ts` and the corresponding API routes in `src/app/api/auth/`.
+**Authentication Changes**: Always update both `src/auth.ts` and corresponding API routes in `src/app/api/auth/`. The system uses NextAuth.js v5 with custom providers.
 
-For 3D model viewer changes, the main components are in `src/components/model-viewer/` with `SafeStage.tsx` containing the lighting setup.
+**3D Model Viewer**: Main components in `src/components/model-viewer/` with `SafeStage.tsx` containing custom lighting setup. WebGL context loss handling is implemented in `Model.tsx`.
 
-Database schema changes require running migrations and updating the seed file at `prisma/seed.ts`.
+**Database Changes**: Run migrations and update seed file at `prisma/seed.ts`. Demo users have fixed IDs defined in `src/lib/demo.ts`.
 
-Payment flow modifications must consider webhook handling in `src/app/api/checkout/webhook/route.ts` and email template generation.
+**Payment Flow**: Webhook handling in `src/app/api/checkout/webhook/route.ts` processes Stripe events. Must maintain API version compatibility and ensure proper error handling.
+
+**CSP Updates**: When adding new external services, update Content Security Policy in `next.config.mjs`. Current CSP allows Stripe and Vercel Live domains.
+
+**Stripe Integration**: Use API version 2025-01-27.acacia. Webhook secrets differ between development (Stripe CLI) and production (Stripe Dashboard). Products must have `productId` metadata linking to database records.
