@@ -9,7 +9,7 @@
 import { stripe } from '@/lib/stripe-server';
 import { headers } from 'next/headers';
 import { generateToken } from '@/lib/token';
-import { EmailType, sendPurchaseConfirmationEmail } from '@/lib/email';
+import { sendPurchaseConfirmationEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 import { generateOrderNumber } from '@/utils/order';
 import type Stripe from 'stripe';
@@ -89,7 +89,8 @@ async function createOrder(
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = (await headers()).get('stripe-signature') as string;
+  const signature = headers().get('stripe-signature') as string;
+
 
   try {
     // ①Stripeからのwebhookリクエストの署名を検証
@@ -99,11 +100,14 @@ export async function POST(request: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
 
+
     // ②決済完了イベントの処理
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
 
+
       if (!session.customer_details?.email) {
+        console.error('No customer email found in session');
         throw new Error('Customer email not found');
       }
 
@@ -132,26 +136,23 @@ export async function POST(request: Request) {
           checkoutProducts
         );
 
+
         try {
           // ⑥購入確認メールの送信
-          await sendPurchaseConfirmationEmail({
-            type: EmailType.ORDER,
-            email: session.customer_details.email,
-            order: {
+          await sendPurchaseConfirmationEmail(
+            session.customer_details.email,
+            {
               orderNumber: order.orderNumber,
               items: order.items.map((item) => ({
                 name: item.name,
-                nameEn: item.nameEn,
                 price: item.price,
               })),
               totalAmount: order.totalAmount,
             },
-            downloadUrl: `${process.env.APP_URL}/download/${downloadToken}`,
-            signupUrl: `${
-              process.env.APP_URL
-            }/signup?email=${encodeURIComponent(session.customer_details.email)}`,
-            hasAccount: !!session.client_reference_id,
-          });
+            `${process.env.APP_URL}/download/${downloadToken}`,
+            `${process.env.APP_URL}/signup?email=${encodeURIComponent(session.customer_details.email)}`,
+            !!session.client_reference_id
+          );
         } catch (emailError) {
           console.error(
             'Failed to send purchase confirmation email:',
@@ -168,6 +169,7 @@ export async function POST(request: Request) {
         });
       }
     }
+    
     return new Response(null, { status: 200 });
   } catch (error) {
     console.error('Webhook error:', error);

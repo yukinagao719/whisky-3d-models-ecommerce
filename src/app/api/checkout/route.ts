@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     const idempotencyKey = uuidv4();
 
     const sessionOptions: Stripe.Checkout.SessionCreateParams = {
-      client_reference_id: session?.user.id,
+      client_reference_id: session?.user?.id,
       payment_method_types: ['card'],
       customer_email: email,
       line_items: productsFromDB.map((product) => ({

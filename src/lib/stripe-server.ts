@@ -6,5 +6,6 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 // サーバーサイド用Stripeインスタンスの初期化
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia',
+  // @ts-expect-error - Stripe CLI uses newer API version for webhook compatibility
+  apiVersion: '2025-01-27.acacia',
 });

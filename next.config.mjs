@@ -1,9 +1,3 @@
-import bundleAnalyzer from '@next/bundle-analyzer';
-
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -45,6 +39,7 @@ const nextConfig = {
               "img-src 'self' data: blob: https://avatars.githubusercontent.com https://lh3.googleusercontent.com https://*.cloudfront.net",
               "font-src 'self' https://fonts.gstatic.com",
               "connect-src 'self' blob: https://api.stripe.com https://checkout.stripe.com https://*.amazonaws.com https://*.cloudfront.net",
+              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
               "media-src 'self' https://*.cloudfront.net",
               "object-src 'none'",
               "base-uri 'self'",
@@ -75,4 +70,4 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default nextConfig;

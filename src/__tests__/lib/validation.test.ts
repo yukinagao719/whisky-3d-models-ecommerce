@@ -43,34 +43,34 @@ describe('Validation Utils', () => {
     it('rejects weak passwords', () => {
       expect(validatePassword('weak')).toEqual({
         isValid: false,
-        error: 'パスワードは8文字以上で入力してください',
+        error: 'パスワードは8文字以上で設定してください',
       });
       expect(validatePassword('12345678')).toEqual({
         isValid: false,
-        error: 'パスワードの形式が正しくありません',
+        error: 'パスワードは大文字、小文字、数字、特殊文字を含む8文字以上で設定してください',
       });
       expect(validatePassword('password')).toEqual({
         isValid: false,
-        error: 'パスワードの形式が正しくありません',
+        error: 'パスワードは大文字、小文字、数字、特殊文字を含む8文字以上で設定してください',
       });
       expect(validatePassword('Password')).toEqual({
         isValid: false,
-        error: 'パスワードの形式が正しくありません',
+        error: 'パスワードは大文字、小文字、数字、特殊文字を含む8文字以上で設定してください',
       });
       expect(validatePassword('Password1')).toEqual({
         isValid: false,
-        error: 'パスワードの形式が正しくありません',
+        error: 'パスワードは大文字、小文字、数字、特殊文字を含む8文字以上で設定してください',
       });
     });
 
     it('rejects short passwords', () => {
       expect(validatePassword('Short1!')).toEqual({
         isValid: false,
-        error: 'パスワードは8文字以上で入力してください',
+        error: 'パスワードは8文字以上で設定してください',
       });
       expect(validatePassword('Aa1!')).toEqual({
         isValid: false,
-        error: 'パスワードは8文字以上で入力してください',
+        error: 'パスワードは8文字以上で設定してください',
       });
     });
   });
@@ -110,11 +110,11 @@ describe('Validation Utils', () => {
       
       expect(validateImage(invalidTxt)).toEqual({
         isValid: false,
-        error: 'PNG, JPEG, WebP形式のファイルのみアップロード可能です',
+        error: 'JPEG、PNG、WebP形式のファイルを選択してください',
       });
       expect(validateImage(invalidPdf)).toEqual({
         isValid: false,
-        error: 'PNG, JPEG, WebP形式のファイルのみアップロード可能です',
+        error: 'JPEG、PNG、WebP形式のファイルを選択してください',
       });
     });
 

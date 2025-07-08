@@ -10,7 +10,10 @@ test.describe('レスポンシブ対応', () => {
   for (const viewport of viewports) {
     test.describe(`${viewport.name} (${viewport.width}x${viewport.height})`, () => {
       test.beforeEach(async ({ page }) => {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.setViewportSize({
+          width: viewport.width,
+          height: viewport.height,
+        });
         await page.goto('/');
       });
 
@@ -23,18 +26,28 @@ test.describe('レスポンシブ対応', () => {
 
         if (viewport.width >= 768) {
           // デスクトップ・タブレット: メニューが直接表示
-          await expect(page.getByRole('link', { name: 'ホーム' })).toBeVisible();
-          await expect(page.getByRole('link', { name: '商品一覧' })).toBeVisible();
-          await expect(page.getByRole('button', { name: 'ログイン' })).toBeVisible();
+          await expect(
+            page.getByRole('link', { name: 'ホーム' })
+          ).toBeVisible();
+          await expect(
+            page.getByRole('link', { name: '商品一覧' })
+          ).toBeVisible();
+          await expect(
+            page.getByRole('button', { name: 'ログイン' })
+          ).toBeVisible();
         } else {
           // モバイル: ハンバーガーメニューボタンが表示
           const menuButton = page.getByRole('button', { name: 'メニュー' });
           await expect(menuButton).toBeVisible();
-          
+
           // メニューを開く
           await menuButton.click();
-          await expect(page.getByRole('link', { name: 'ホーム' })).toBeVisible();
-          await expect(page.getByRole('link', { name: '商品一覧' })).toBeVisible();
+          await expect(
+            page.getByRole('link', { name: 'ホーム' })
+          ).toBeVisible();
+          await expect(
+            page.getByRole('link', { name: '商品一覧' })
+          ).toBeVisible();
         }
       });
 
@@ -49,11 +62,15 @@ test.describe('レスポンシブ対応', () => {
 
         // フッターコンテンツの確認
         await expect(page.getByText('© 2024 3D/WHISKY')).toBeVisible();
-        
+
         if (viewport.width >= 768) {
           // デスクトップ・タブレット: フッターリンクが横並び
-          await expect(page.getByRole('link', { name: 'プライバシーポリシー' })).toBeVisible();
-          await expect(page.getByRole('link', { name: '利用規約' })).toBeVisible();
+          await expect(
+            page.getByRole('link', { name: 'プライバシーポリシー' })
+          ).toBeVisible();
+          await expect(
+            page.getByRole('link', { name: '利用規約' })
+          ).toBeVisible();
         }
       });
 
@@ -70,20 +87,26 @@ test.describe('レスポンシブ対応', () => {
         // グリッドレイアウトの確認
         if (viewport.width >= 1024) {
           // デスクトップ: 3-4列
-          const firstRowCards = productCards.first().locator('xpath=following-sibling::*[position()<3]');
+          const firstRowCards = productCards
+            .first()
+            .locator('xpath=following-sibling::*[position()<3]');
           await expect(firstRowCards).toHaveCount(2, { timeout: 5000 });
         } else if (viewport.width >= 768) {
           // タブレット: 2列
           const gridColumns = await page.evaluate(() => {
             const grid = document.querySelector('[data-testid="product-grid"]');
-            return window.getComputedStyle(grid).gridTemplateColumns;
+            return grid
+              ? window.getComputedStyle(grid).gridTemplateColumns
+              : '';
           });
           expect(gridColumns).toContain('1fr 1fr');
         } else {
           // モバイル: 1列
           const gridColumns = await page.evaluate(() => {
             const grid = document.querySelector('[data-testid="product-grid"]');
-            return window.getComputedStyle(grid).gridTemplateColumns;
+            return grid
+              ? window.getComputedStyle(grid).gridTemplateColumns
+              : '';
           });
           expect(gridColumns).toContain('1fr');
         }
@@ -91,7 +114,11 @@ test.describe('レスポンシブ対応', () => {
 
       test('商品詳細ページのレイアウト', async ({ page }) => {
         await page.goto('/products');
-        await page.locator('[data-testid="product-card"]').first().getByRole('button', { name: '詳細を見る' }).click();
+        await page
+          .locator('[data-testid="product-card"]')
+          .first()
+          .getByRole('button', { name: '詳細を見る' })
+          .click();
 
         // 3Dモデルビューワーの確認
         const modelViewer = page.locator('[data-testid="model-viewer"]');
@@ -104,13 +131,15 @@ test.describe('レスポンシブ対応', () => {
         if (viewport.width >= 768) {
           // デスクトップ・タブレット: 横並びレイアウト
           const productLayout = page.locator('[data-testid="product-layout"]');
-          const layoutStyle = await productLayout.evaluate(el => window.getComputedStyle(el).display);
+          const layoutStyle = await productLayout.evaluate(
+            (el) => window.getComputedStyle(el).display
+          );
           expect(['flex', 'grid']).toContain(layoutStyle);
         } else {
           // モバイル: 縦並びレイアウト
           const modelViewerBox = await modelViewer.boundingBox();
           const productInfoBox = await productInfo.boundingBox();
-          
+
           if (modelViewerBox && productInfoBox) {
             // モバイルでは3Dビューワーが上、商品情報が下に配置される
             expect(modelViewerBox.y).toBeLessThan(productInfoBox.y);
@@ -121,7 +150,11 @@ test.describe('レスポンシブ対応', () => {
       test('カートページのレスポンシブ表示', async ({ page }) => {
         // 商品をカートに追加
         await page.goto('/products');
-        await page.locator('[data-testid="product-card"]').first().getByRole('button', { name: '詳細を見る' }).click();
+        await page
+          .locator('[data-testid="product-card"]')
+          .first()
+          .getByRole('button', { name: '詳細を見る' })
+          .click();
         await page.getByRole('button', { name: 'カートに追加' }).click();
 
         // カートページに移動
@@ -139,11 +172,14 @@ test.describe('レスポンシブ対応', () => {
           // モバイルでは要素が縦に配置される
           const itemImage = cartItem.locator('img');
           const itemDetails = cartItem.locator('[data-testid="item-details"]');
-          
-          if (await itemImage.isVisible() && await itemDetails.isVisible()) {
+
+          if (
+            (await itemImage.isVisible()) &&
+            (await itemDetails.isVisible())
+          ) {
             const imageBox = await itemImage.boundingBox();
             const detailsBox = await itemDetails.boundingBox();
-            
+
             if (imageBox && detailsBox) {
               expect(imageBox.y).toBeLessThanOrEqual(detailsBox.y);
             }
@@ -175,16 +211,22 @@ test.describe('レスポンシブ対応', () => {
         // フォーム要素の表示確認
         await expect(page.getByLabel('メールアドレス')).toBeVisible();
         await expect(page.getByLabel('パスワード')).toBeVisible();
-        await expect(page.getByRole('button', { name: 'ログイン' })).toBeVisible();
+        await expect(
+          page.getByRole('button', { name: 'ログイン' })
+        ).toBeVisible();
       });
 
       test('3Dモデルビューワーのタッチ操作（モバイル）', async ({ page }) => {
         if (viewport.width >= 768) {
-          test.skip('This test is only for mobile devices');
+          test.skip();
         }
 
         await page.goto('/products');
-        await page.locator('[data-testid="product-card"]').first().getByRole('button', { name: '詳細を見る' }).click();
+        await page
+          .locator('[data-testid="product-card"]')
+          .first()
+          .getByRole('button', { name: '詳細を見る' })
+          .click();
 
         const canvas = page.locator('[data-testid="model-viewer"] canvas');
         await canvas.waitFor({ state: 'visible' });
@@ -211,8 +253,12 @@ test.describe('レスポンシブ対応', () => {
         await page.goto('/products');
 
         // メインテキストのフォントサイズ確認
-        const productTitle = page.locator('[data-testid="product-card"] h3').first();
-        const fontSize = await productTitle.evaluate(el => window.getComputedStyle(el).fontSize);
+        const productTitle = page
+          .locator('[data-testid="product-card"] h3')
+          .first();
+        const fontSize = await productTitle.evaluate(
+          (el) => window.getComputedStyle(el).fontSize
+        );
         const fontSizeNumber = parseInt(fontSize);
 
         if (viewport.width < 768) {
@@ -225,9 +271,11 @@ test.describe('レスポンシブ対応', () => {
 
         // ボタンのタッチターゲットサイズ確認（モバイル）
         if (viewport.width < 768) {
-          const button = page.getByRole('button', { name: '詳細を見る' }).first();
+          const button = page
+            .getByRole('button', { name: '詳細を見る' })
+            .first();
           const buttonBox = await button.boundingBox();
-          
+
           if (buttonBox) {
             // 最小タッチターゲットサイズ（44px推奨）
             expect(buttonBox.height).toBeGreaterThanOrEqual(40);
@@ -240,14 +288,14 @@ test.describe('レスポンシブ対応', () => {
 
         // ページが長い場合のスクロール確認
         const initialScrollY = await page.evaluate(() => window.scrollY);
-        
+
         // ページ下部までスクロール
         await page.evaluate(() => {
           window.scrollTo(0, document.body.scrollHeight);
         });
 
         await page.waitForTimeout(500);
-        
+
         const finalScrollY = await page.evaluate(() => window.scrollY);
         expect(finalScrollY).toBeGreaterThan(initialScrollY);
 
@@ -262,9 +310,13 @@ test.describe('レスポンシブ対応', () => {
     // 縦向き
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/products');
-    
-    await page.locator('[data-testid="product-card"]').first().getByRole('button', { name: '詳細を見る' }).click();
-    
+
+    await page
+      .locator('[data-testid="product-card"]')
+      .first()
+      .getByRole('button', { name: '詳細を見る' })
+      .click();
+
     const modelViewer = page.locator('[data-testid="model-viewer"]');
     await expect(modelViewer).toBeVisible();
 
@@ -274,7 +326,7 @@ test.describe('レスポンシブ対応', () => {
 
     // 3Dビューワーが横向きでも正常に表示されることを確認
     await expect(modelViewer).toBeVisible();
-    
+
     const canvas = modelViewer.locator('canvas');
     await expect(canvas).toBeVisible();
   });

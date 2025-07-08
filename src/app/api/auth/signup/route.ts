@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/token';
-import { EmailType, sendVerificationEmail } from '@/lib/email';
+import { sendVerificationEmail } from '@/lib/email';
 import {
   validateName,
   validateEmail,
@@ -111,12 +111,11 @@ export async function POST(request: Request) {
       );
 
       // 5. メール送信（失敗時は全体をロールバック）
-      const emailResult = await sendVerificationEmail({
-        type: EmailType.VERIFICATION,
-        email: normalizedEmail,
-        token: verificationToken.token,
-        baseUrl: process.env.APP_URL || '',
-      });
+      const emailResult = await sendVerificationEmail(
+        normalizedEmail,
+        verificationToken.token,
+        process.env.APP_URL || ''
+      );
 
       if (!emailResult.success) {
         console.error('Failed to send verification email:', emailResult.error);
