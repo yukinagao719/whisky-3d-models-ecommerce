@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     alternateLocale: ['en_US'],
     images: [
       {
-        url: '/ogp-image_1200x630.png',
+        url: '/ogp-image_1200x630.webp',
         width: 1200,
         height: 630,
         alt: '3D/WHISKY - ウイスキーの3Dモデル販売',
@@ -52,18 +52,36 @@ export const metadata: Metadata = {
   icons: [
     {
       rel: 'icon',
-      url: '/favicon_32x32.ico',
-    },
-    {
-      rel: 'apple-touch-icon',
-      url: '/apple-touch-icon_180x180.jpg',
+      url: '/favicon-16x16.png',
+      sizes: '16x16',
+      type: 'image/png',
     },
     {
       rel: 'icon',
-      url: '/icon_192x192.jpg',
+      url: '/favicon-32x32.png',
+      sizes: '32x32',
+      type: 'image/png',
+    },
+    {
+      rel: 'apple-touch-icon',
+      url: '/apple-touch-icon.png',
+      sizes: '180x180',
+      type: 'image/png',
+    },
+    {
+      rel: 'icon',
+      url: '/android-chrome-192x192.png',
       sizes: '192x192',
+      type: 'image/png',
+    },
+    {
+      rel: 'icon',
+      url: '/android-chrome-512x512.png',
+      sizes: '512x512',
+      type: 'image/png',
     },
   ],
+  manifest: '/site.webmanifest',
   twitter: {
     card: 'summary_large_image',
     title: '3D/WHISKY|ウイスキーの美学をデジタルで紡ぎ直す',
